@@ -1,0 +1,20 @@
+services:
+  mcp-context7:
+    image: mcp/context7:latest
+    restart: unless-stopped
+    env_file: ${MCP_ENV_FILE:-/run/mcp/mcp.env}
+
+  mcp-dockerhub:
+    image: mcp/dockerhub:latest
+    restart: unless-stopped
+    env_file: ${MCP_ENV_FILE:-/run/mcp/mcp.env}
+
+  mcp-playwright:
+    image: mcp/mcp-playwright:latest
+    restart: unless-stopped
+    env_file: ${MCP_ENV_FILE:-/run/mcp/mcp.env}
+
+  mcp-sequentialthinking:
+    image: mcp/sequentialthinking:latest
+    restart: unless-stopped
+    env_file: ${MCP_ENV_FILE:-/run/mcp/mcp.env}
