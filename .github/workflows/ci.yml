@@ -15,50 +15,22 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Install PSScriptAnalyzer
+      - name: Ensure PSScriptAnalyzer
         shell: pwsh
         run: |
-          Install-Module -Name PSScriptAnalyzer -Force -Scope CurrentUser
+          if (-not (Get-Module -ListAvailable -Name PSScriptAnalyzer)) {
+            Install-Module -Name PSScriptAnalyzer -Force -Scope CurrentUser
+          }
+
+      - name: Check PowerShell formatting
+        shell: pwsh
+        run: |
+          ./tools/lint.ps1 -Mode FormatCheck
 
       - name: Run PSScriptAnalyzer
         shell: pwsh
         run: |
-          $scripts = Get-ChildItem -Path . -Filter *.ps1 -Recurse
-          $errors = @()
-          $warnings = @()
-
-          foreach ($script in $scripts) {
-            Write-Host "Analyzing: $($script.FullName)"
-            # Only check for Errors - these scripts are user-facing and use Write-Host appropriately
-            $results = Invoke-ScriptAnalyzer -Path $script.FullName -Severity Error,Warning
-            if ($results) {
-              $scriptErrors = $results | Where-Object { $_.Severity -eq 'Error' }
-              $scriptWarnings = $results | Where-Object { $_.Severity -eq 'Warning' }
-
-              if ($scriptErrors) {
-                $errors += $scriptErrors
-                Write-Host "ERRORS:" -ForegroundColor Red
-                $scriptErrors | Format-Table -AutoSize
-              }
-
-              if ($scriptWarnings) {
-                $warnings += $scriptWarnings
-                Write-Host "WARNINGS (informational only):" -ForegroundColor Yellow
-                $scriptWarnings | Format-Table -AutoSize
-              }
-            }
-          }
-
-          if ($warnings.Count -gt 0) {
-            Write-Host "::warning::Found $($warnings.Count) PSScriptAnalyzer warnings (not failing build)"
-          }
-
-          if ($errors.Count -gt 0) {
-            Write-Host "::error::Found $($errors.Count) PSScriptAnalyzer errors"
-            exit 1
-          }
-
-          Write-Host "✓ All PowerShell scripts passed linting (0 errors, $($warnings.Count) warnings)"
+          ./tools/lint.ps1 -Mode Analyze -FailOnNewWarnings
 
   lint-bash:
     name: Lint Bash Scripts
