@@ -91,14 +91,18 @@ Transform the mcp-stacks GitOps deployment platform from a functional proof-of-c
 #### 1.2 Monitoring & Observability Foundation
 **Duration:** 2 weeks | **Owner:** SRE Lead
 
-- Deploy Prometheus + Grafana stack on Jabba (NAS)
+- Deploy Prometheus + Grafana stack on Jabba (NAS) **or** migrate it to a
+  dedicated host when NAS resources are constrained
 - Implement cAdvisor for container metrics on all endpoints
 - Create Grafana dashboards for MCP service health
-- Implement Loki for centralized log aggregation
-- Configure Promtail on Agent and Edge endpoints
+- Implement Loki for centralized log aggregation on the remote host when the NAS
+  runs Plex/backups, or keep only lightweight collectors locally
+- Configure Promtail/Telegraf agents on Agent and Edge endpoints with remote
+  write targets
 
 **Deliverables:**
-- `stacks/monitoring/docker-compose.yml` for observability stack
+- `stacks/monitoring/docker-compose.yml` for full observability stack
+- `stacks/monitoring-lite/docker-compose.yml` for NAS-friendly collectors
 - Base Grafana dashboards (exportable JSON)
 - Loki query documentation
 

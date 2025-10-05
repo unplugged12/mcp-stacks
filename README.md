@@ -514,6 +514,20 @@ Topics covered:
 - Grafana dashboards
 - Container metrics with cAdvisor
 
+#### Resource Planning for Monitoring Stacks
+
+- The full Prometheus/Grafana/Loki bundle typically consumes **4+ vCPU**, **8+ GB
+  RAM**, and fast SSD storage for metrics and logs. Avoid running it on the NAS
+  when Plex, backups, or VMs already compete for those resources. Instead,
+  deploy it on a dedicated observability node or cloud VM and point agents at
+  that host.
+- For NAS deployments, use the lightweight collectors defined in
+  [`stacks/monitoring-lite`](stacks/monitoring-lite/README.md). They forward
+  telemetry to a remote backend (Grafana Cloud, InfluxDB Cloud, VictoriaMetrics,
+  etc.) while keeping local usage under ~200 MB RAM and <1 vCPU steady state.
+- Always store remote API tokens in Portainer secrets or stack environment
+  variables—**never commit credentials to Git**.
+
 ---
 
 ## Triggering Redeployments

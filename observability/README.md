@@ -665,6 +665,65 @@ groups:
 
 ## Tools & Integration
 
+---
+
+## Lightweight Observability Strategy for NAS Endpoints
+
+The full Prometheus + Grafana + Loki stack delivers deep insights, but it can
+consume several CPU cores, multiple gigabytes of RAM, and significant disk
+IO—resources that a NAS already sharing Plex, backup jobs, or VM workloads
+cannot spare. To keep telemetry flowing without overwhelming the NAS, adopt one
+of the following strategies.
+
+### Option 1: Offload Heavy Components to a Remote Host
+
+1. **Run collectors on the NAS**: Keep only lightweight agents (Telegraf,
+   Promtail, node-exporter) on the NAS. They gather metrics/logs and forward
+   them upstream.
+2. **Deploy storage & visualization elsewhere**: Host Prometheus, Grafana,
+   Loki/Tempo on a more capable machine (homelab server, cloud VM). Configure
+   remote write/HTTP endpoints in the NAS agents.
+3. **Benefits**:
+   - NAS CPU/RAM remain available for Plex, ZFS scrubs, or VM workloads.
+   - Heavy queries and retention policies run on hardware designed for it.
+   - Scale dashboards/alerting without impacting local services.
+
+### Option 2: Replace with Lightweight, All-in-One Collectors
+
+If a remote backend is not available, replace the heavy bundle with a
+single-agent solution tailored for constrained devices:
+
+- **Netdata (Agent mode)** for per-second visibility and local dashboards with
+  minimal tuning.
+- **Telegraf + Remote Backend** for metrics-only collection to InfluxDB Cloud,
+  Timescale Cloud, or VictoriaMetrics SaaS.
+- **Vector or Promtail** for log forwarding to Grafana Cloud Loki or another
+  managed store.
+
+The new `stacks/monitoring-lite/docker-compose.yml` defines this minimal agent
+set. See [Lightweight Monitoring Stack](../stacks/monitoring-lite/README.md) for
+usage guidance.
+
+### Deployment Decision Matrix
+
+| Environment | Recommended Stack | Rationale |
+|-------------|-------------------|-----------|
+| Dedicated observability host | `stacks/monitoring/docker-compose.yml` | Runs complete monitoring platform locally |
+| NAS hosting Plex/backups | `stacks/monitoring-lite/docker-compose.yml` | Keeps resource usage low, ships telemetry remotely |
+| Remote cloud monitoring | `stacks/monitoring-lite/docker-compose.yml` + managed backends | Avoids local storage of metrics/logs |
+
+### Configuration Considerations
+
+- **Network**: Ensure outbound HTTPS connectivity from the NAS to remote
+  telemetry services.
+- **Authentication**: Store API tokens (Grafana Cloud, InfluxDB, etc.) as stack
+  environment variables or Portainer secrets.
+- **Retention & Compliance**: Managed platforms handle data retention, but
+  verify your policies before forwarding sensitive logs.
+
+By separating collection from storage/visualization, the NAS contributes to the
+observability fabric without sacrificing performance or reliability.
+
 ### Recommended Stack
 
 | Component | Tool | Purpose |
