@@ -4,17 +4,160 @@ services:
     restart: unless-stopped
     env_file: ${MCP_ENV_FILE:-/run/mcp/mcp.env}
 
+    # Health check configuration
+    healthcheck:
+      test: ["CMD-SHELL", "timeout 5 sh -c ':> /dev/tcp/127.0.0.1/3000' || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+    # Resource limits
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
+
+    # Logging configuration
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+        labels: "service,environment"
+
+    # Labels for observability
+    labels:
+      - "com.mcp.service=context7"
+      - "com.mcp.version=latest"
+      - "com.mcp.environment=${ENVIRONMENT:-production}"
+
   mcp-dockerhub:
     image: mcp/dockerhub:latest
     restart: unless-stopped
     env_file: ${MCP_ENV_FILE:-/run/mcp/mcp.env}
+
+    # Health check configuration
+    healthcheck:
+      test: ["CMD-SHELL", "timeout 5 sh -c ':> /dev/tcp/127.0.0.1/3000' || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+    # Resource limits
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+        reservations:
+          cpus: '0.1'
+          memory: 64M
+
+    # Logging configuration
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+        labels: "service,environment"
+
+    # Labels for observability
+    labels:
+      - "com.mcp.service=dockerhub"
+      - "com.mcp.version=latest"
+      - "com.mcp.environment=${ENVIRONMENT:-production}"
 
   mcp-playwright:
     image: mcp/mcp-playwright:latest
     restart: unless-stopped
     env_file: ${MCP_ENV_FILE:-/run/mcp/mcp.env}
 
+    # Health check configuration
+    healthcheck:
+      test: ["CMD-SHELL", "timeout 5 sh -c ':> /dev/tcp/127.0.0.1/3000' || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s  # Playwright needs more time to start
+
+    # Resource limits (Playwright needs more resources for browser automation)
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 2G
+        reservations:
+          cpus: '0.5'
+          memory: 256M
+
+    # Logging configuration
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+        labels: "service,environment"
+
+    # Labels for observability
+    labels:
+      - "com.mcp.service=playwright"
+      - "com.mcp.version=latest"
+      - "com.mcp.environment=${ENVIRONMENT:-production}"
+
+    # Security options for browser automation
+    security_opt:
+      - seccomp:unconfined
+
+    # Shared memory size for Chromium
+    shm_size: 2gb
+
   mcp-sequentialthinking:
     image: mcp/sequentialthinking:latest
     restart: unless-stopped
     env_file: ${MCP_ENV_FILE:-/run/mcp/mcp.env}
+
+    # Health check configuration
+    healthcheck:
+      test: ["CMD-SHELL", "timeout 5 sh -c ':> /dev/tcp/127.0.0.1/3000' || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+    # Resource limits
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
+
+    # Logging configuration
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+        labels: "service,environment"
+
+    # Labels for observability
+    labels:
+      - "com.mcp.service=sequentialthinking"
+      - "com.mcp.version=latest"
+      - "com.mcp.environment=${ENVIRONMENT:-production}"
+
+# Network configuration (optional: uncomment for network isolation)
+# networks:
+#   mcp-network:
+#     driver: bridge
+#     ipam:
+#       config:
+#         - subnet: 172.28.0.0/16

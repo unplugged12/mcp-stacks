@@ -520,6 +520,7 @@ docker pull mcp/context7:latest
 |--------|---------|----------|
 | `scripts/validation/pre-deploy-check.ps1` | Pre-deployment validation | PowerShell |
 | `scripts/validation/post-deploy-check.ps1` | Post-deployment verification | PowerShell |
+| `scripts/smoke-test.ps1` | Comprehensive health validation suite | PowerShell |
 
 ---
 
@@ -538,6 +539,30 @@ When adding new MCP servers or making infrastructure changes:
    ```
 4. **Document changes** in this README
 5. **Create meaningful commits** - helpful for rollbacks
+
+---
+
+## Future Enhancements
+
+The mcp-stacks platform is evolving toward production-grade maturity. Planned enhancements include:
+
+### Next Phase Priorities
+
+1. **Monitoring & Alerting** - Prometheus/Grafana stack with health metrics, log aggregation via Loki, and PagerDuty/Opsgenie integration for on-call alerting
+2. **Multi-Environment Support** - Isolated dev/staging/prod environments with automated promotion workflows and environment-specific configurations
+3. **CI/CD Integration** - GitHub Actions or Azure Pipelines for automated testing, secrets scanning, and deployment orchestration
+
+### Additional Roadmap Items
+
+- **Disaster Recovery** - Automated backup/restore procedures for Portainer configs and Edge settings
+- **Performance Optimization** - Container profiling, image layer optimization, and network tuning
+- **Tailscale Integration** - Mesh networking with MagicDNS for seamless off-LAN connectivity
+- **Expanded MCP Catalog** - Evaluation and deployment of additional MCP servers (filesystem, database, git, etc.)
+- **Enhanced Documentation** - Architecture diagrams, operational runbooks, troubleshooting decision trees
+
+For detailed roadmap, risks, and work breakdown, see [docs/ROADMAP.md](docs/ROADMAP.md).
+
+For the complete backlog ready for Azure DevOps/Jira import, see [docs/backlog.csv](docs/backlog.csv).
 
 ---
 
