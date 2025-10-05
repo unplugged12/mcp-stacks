@@ -33,8 +33,6 @@ if ($uid -ne 0) {
 Write-Host "🔐 MCP Agent Environment Configuration" -ForegroundColor Cyan
 Write-Host "=======================================" -ForegroundColor Cyan
 Write-Host ""
-
-$overwrite = $true
 if (Test-Path -Path $envFile) {
     $response = Read-Host "An existing env file was found at $envFile. Overwrite? (y/N)"
     if ([string]::IsNullOrWhiteSpace($response)) {
