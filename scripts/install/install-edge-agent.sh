@@ -90,9 +90,7 @@ echo ""
 echo -e "${CYAN}Deploying Edge Agent...${NC}"
 echo ""
 
-eval "$DOCKER_COMMAND"
-
-if [ $? -eq 0 ]; then
+if eval "$DOCKER_COMMAND"; then
     echo ""
     echo -e "${GREEN}✓ Edge Agent deployed successfully${NC}"
 else

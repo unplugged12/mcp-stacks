@@ -59,14 +59,12 @@ docker pull portainer/agent:latest
 echo ""
 echo -e "${CYAN}Deploying Portainer Agent on port $AGENT_PORT...${NC}"
 
-docker run -d \
+if docker run -d \
     --name portainer_agent \
     --restart=always \
     -p "${AGENT_PORT}:9001" \
     -v /var/run/docker.sock:/var/run/docker.sock \
-    portainer/agent:latest
-
-if [ $? -eq 0 ]; then
+    portainer/agent:latest; then
     echo -e "${GREEN}✓ Agent deployed successfully${NC}"
 else
     echo -e "${RED}✗ Agent deployment failed${NC}"

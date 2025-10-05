@@ -79,12 +79,10 @@ if [ "$TYPE" = "agent" ]; then
 EOF
 )
 
-    RESPONSE=$(curl "${CURL_OPTS[@]}" \
+    if RESPONSE=$(curl "${CURL_OPTS[@]}" \
         -X PUT \
         -d "$BODY" \
-        "$PORTAINER_URL/api/stacks/$STACK_ID/git/redeploy?endpointId=$ENDPOINT_ID")
-
-    if [ $? -eq 0 ]; then
+        "$PORTAINER_URL/api/stacks/$STACK_ID/git/redeploy?endpointId=$ENDPOINT_ID"); then
         echo -e "${GREEN}✓ Redeploy triggered successfully${NC}"
         echo ""
         echo -e "${CYAN}Stack updated from Git. Check Portainer UI for status:${NC}"
