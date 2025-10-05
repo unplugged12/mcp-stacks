@@ -1,0 +1,250 @@
+name: Deploy to Portainer
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target environment'
+        required: true
+        type: choice
+        options:
+          - desktop
+          - laptop
+          - all
+      stack_name:
+        description: 'Stack name (leave empty for default)'
+        required: false
+        type: string
+      force_redeploy:
+        description: 'Force redeploy even if no changes'
+        required: false
+        type: boolean
+        default: false
+
+env:
+  PORTAINER_URL: https://jabba.lan:9444
+
+jobs:
+  pre-deploy-validation:
+    name: Pre-Deployment Validation
+    runs-on: ubuntu-latest
+    outputs:
+      compose_valid: ${{ steps.validate.outputs.valid }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Validate Docker Compose files
+        id: validate
+        run: |
+          echo "Validating compose files for: ${{ inputs.environment }}"
+
+          # Create dummy env file
+          cat > .env.test <<EOF
+          MCP_ENV_FILE=/tmp/mcp.env
+          HUB_USERNAME=${{ secrets.HUB_USERNAME }}
+          HUB_PAT_TOKEN=${{ secrets.HUB_PAT_TOKEN }}
+          CONTEXT7_TOKEN=${{ secrets.CONTEXT7_TOKEN }}
+          ENVIRONMENT=production
+          EOF
+
+          VALIDATION_PASSED=true
+
+          if [ "${{ inputs.environment }}" = "desktop" ] || [ "${{ inputs.environment }}" = "all" ]; then
+            echo "Validating desktop compose..."
+            if docker compose -f stacks/desktop/docker-compose.yml --env-file .env.test config > /dev/null 2>&1; then
+              echo "✓ Desktop compose valid"
+            else
+              echo "✗ Desktop compose validation failed"
+              VALIDATION_PASSED=false
+            fi
+          fi
+
+          if [ "${{ inputs.environment }}" = "laptop" ] || [ "${{ inputs.environment }}" = "all" ]; then
+            echo "Validating laptop compose..."
+            if docker compose -f stacks/laptop/docker-compose.yml --env-file .env.test config > /dev/null 2>&1; then
+              echo "✓ Laptop compose valid"
+            else
+              echo "✗ Laptop compose validation failed"
+              VALIDATION_PASSED=false
+            fi
+          fi
+
+          rm -f .env.test
+
+          if [ "$VALIDATION_PASSED" = "true" ]; then
+            echo "valid=true" >> $GITHUB_OUTPUT
+            echo "✅ All validations passed"
+          else
+            echo "valid=false" >> $GITHUB_OUTPUT
+            echo "❌ Validation failed"
+            exit 1
+          fi
+
+  deploy-agent-stacks:
+    name: Deploy Agent Stacks (Desktop)
+    runs-on: ubuntu-latest
+    needs: pre-deploy-validation
+    if: inputs.environment == 'desktop' || inputs.environment == 'all'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy to Portainer via API
+        env:
+          PORTAINER_API_KEY: ${{ secrets.PORTAINER_API_KEY }}
+          STACK_NAME: ${{ inputs.stack_name || 'mcp-desktop' }}
+        run: |
+          echo "🚀 Deploying Agent stack: $STACK_NAME"
+
+          # Note: This is a reference implementation
+          # Actual deployment requires API access and proper endpoint configuration
+
+          cat > deploy-info.md <<EOF
+          ## Desktop Stack Deployment
+
+          **Stack Name:** $STACK_NAME
+          **Compose File:** stacks/desktop/docker-compose.yml
+          **Git Ref:** ${{ github.sha }}
+          **Triggered By:** ${{ github.actor }}
+
+          ### Manual Deployment Steps:
+
+          Since this is a private repository and Portainer CE has limitations,
+          you may need to manually trigger the deployment:
+
+          #### Option 1: Portainer UI (Recommended for CE)
+          1. Go to: ${{ env.PORTAINER_URL }}
+          2. Navigate to: Stacks → $STACK_NAME
+          3. Click: "Pull and redeploy" or "Update the stack"
+          4. Verify the Git commit matches: \`${{ github.sha }}\`
+
+          #### Option 2: API (Requires PORTAINER_API_KEY secret)
+          \`\`\`bash
+          # Update stack via Portainer API
+          curl -X PUT "${{ env.PORTAINER_URL }}/api/stacks/\${STACK_ID}?endpointId=\${ENDPOINT_ID}" \\
+            -H "X-API-Key: \${PORTAINER_API_KEY}" \\
+            -H "Content-Type: application/json" \\
+            -d '{
+              "prune": true,
+              "pullImage": true
+            }'
+          \`\`\`
+
+          #### Option 3: PowerShell Script
+          \`\`\`powershell
+          .\scripts\api\redeploy-stack.ps1 -ApiKey "\$env:PORTAINER_API_KEY" -StackName "$STACK_NAME"
+          \`\`\`
+
+          ### Environment Variables Required:
+          - HUB_USERNAME (configured in Portainer)
+          - HUB_PAT_TOKEN (configured in Portainer)
+          - CONTEXT7_TOKEN (configured in Portainer)
+
+          EOF
+
+          cat deploy-info.md >> $GITHUB_STEP_SUMMARY
+
+          # If API key is configured, attempt API deployment
+          if [ -n "$PORTAINER_API_KEY" ]; then
+            echo "✅ PORTAINER_API_KEY is configured"
+            echo "Note: Actual API deployment logic would go here"
+            echo "This requires stack ID, endpoint ID, and proper API implementation"
+          else
+            echo "⚠️  PORTAINER_API_KEY not configured - manual deployment required"
+          fi
+
+  deploy-edge-stacks:
+    name: Deploy Edge Stacks (Laptop)
+    runs-on: ubuntu-latest
+    needs: pre-deploy-validation
+    if: inputs.environment == 'laptop' || inputs.environment == 'all'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy Edge Stack
+        env:
+          PORTAINER_API_KEY: ${{ secrets.PORTAINER_API_KEY }}
+          STACK_NAME: ${{ inputs.stack_name || 'mcp-laptop' }}
+        run: |
+          echo "🚀 Deploying Edge stack: $STACK_NAME"
+
+          cat > edge-deploy-info.md <<EOF
+          ## Edge Stack Deployment
+
+          **Stack Name:** $STACK_NAME
+          **Compose File:** stacks/laptop/docker-compose.yml
+          **Git Ref:** ${{ github.sha }}
+          **Triggered By:** ${{ github.actor }}
+
+          ### Manual Deployment Required for Portainer CE:
+
+          Portainer CE does not support automatic GitOps updates for Edge Stacks.
+          You must manually trigger redeployment:
+
+          #### Option 1: Portainer UI (Required for CE)
+          1. Go to: ${{ env.PORTAINER_URL }}
+          2. Navigate to: Edge Stacks → $STACK_NAME
+          3. Click: "Pull and redeploy"
+          4. Verify the Git commit matches: \`${{ github.sha }}\`
+          5. Wait for Edge Agents to sync (when they connect)
+
+          #### Option 2: PowerShell Script (Informational)
+          \`\`\`powershell
+          # This will show instructions for CE users
+          .\scripts\api\redeploy-stack.ps1 -ApiKey "\$env:PORTAINER_API_KEY" -StackName "$STACK_NAME" -Type edge
+          \`\`\`
+
+          ### Edge Configuration Required:
+          Ensure Edge Config is deployed with:
+          - HUB_USERNAME
+          - HUB_PAT_TOKEN
+          - CONTEXT7_TOKEN
+
+          Path on endpoints: \`/var/edge/configs/mcp.env\`
+
+          EOF
+
+          cat edge-deploy-info.md >> $GITHUB_STEP_SUMMARY
+
+          if [ -n "$PORTAINER_API_KEY" ]; then
+            echo "✅ PORTAINER_API_KEY is configured"
+            echo "⚠️  Note: Edge Stack updates in CE require manual 'Pull and redeploy'"
+          else
+            echo "⚠️  PORTAINER_API_KEY not configured - manual deployment required"
+          fi
+
+  post-deploy-notification:
+    name: Post-Deploy Notification
+    runs-on: ubuntu-latest
+    needs: [deploy-agent-stacks, deploy-edge-stacks]
+    if: always()
+    steps:
+      - name: Deployment Summary
+        run: |
+          echo "## Deployment Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Environment:** ${{ inputs.environment }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Commit:** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Triggered By:** ${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Timestamp:** $(date -u +"%Y-%m-%d %H:%M:%S UTC")" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [ "${{ needs.deploy-agent-stacks.result }}" = "success" ] || \
+             [ "${{ needs.deploy-edge-stacks.result }}" = "success" ]; then
+            echo "### ✅ Deployment Instructions Generated" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "Review the job outputs above for deployment instructions." >> $GITHUB_STEP_SUMMARY
+          else
+            echo "### ⚠️ Deployment Notes" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "Some deployments may have been skipped based on environment selection." >> $GITHUB_STEP_SUMMARY
+          fi
+
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Next Steps:" >> $GITHUB_STEP_SUMMARY
+          echo "1. Follow the manual deployment instructions in the job outputs" >> $GITHUB_STEP_SUMMARY
+          echo "2. Verify stacks are running in Portainer UI" >> $GITHUB_STEP_SUMMARY
+          echo "3. Check container logs for any issues" >> $GITHUB_STEP_SUMMARY
+          echo "4. Run post-deployment validation if needed" >> $GITHUB_STEP_SUMMARY

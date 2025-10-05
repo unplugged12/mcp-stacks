@@ -1,0 +1,78 @@
+[
+  {
+    "Id": 1,
+    "Name": "desktop-jabba",
+    "Type": 1,
+    "URL": "192.168.1.100:9001",
+    "GroupId": 1,
+    "PublicURL": "",
+    "Status": 1,
+    "Snapshots": [],
+    "UserAccessPolicies": {},
+    "TeamAccessPolicies": {},
+    "EdgeID": "",
+    "EdgeKey": "",
+    "TagIds": [],
+    "Tags": null,
+    "Kubernetes": {
+      "Snapshots": []
+    }
+  },
+  {
+    "Id": 2,
+    "Name": "desktop-workstation",
+    "Type": 1,
+    "URL": "192.168.1.101:9001",
+    "GroupId": 1,
+    "PublicURL": "",
+    "Status": 1,
+    "Snapshots": [],
+    "UserAccessPolicies": {},
+    "TeamAccessPolicies": {},
+    "EdgeID": "",
+    "EdgeKey": "",
+    "TagIds": [],
+    "Tags": null,
+    "Kubernetes": {
+      "Snapshots": []
+    }
+  },
+  {
+    "Id": 5,
+    "Name": "laptop-personal",
+    "Type": 4,
+    "URL": "",
+    "GroupId": 2,
+    "PublicURL": "",
+    "Status": 1,
+    "Snapshots": [],
+    "UserAccessPolicies": {},
+    "TeamAccessPolicies": {},
+    "EdgeID": "edge-abc123",
+    "EdgeKey": "agenttunnel|edge-abc123|https://jabba.lan:9444|jabba.lan:8000",
+    "TagIds": [],
+    "Tags": null,
+    "Kubernetes": {
+      "Snapshots": []
+    }
+  },
+  {
+    "Id": 6,
+    "Name": "laptop-work",
+    "Type": 4,
+    "URL": "",
+    "GroupId": 2,
+    "PublicURL": "",
+    "Status": 1,
+    "Snapshots": [],
+    "UserAccessPolicies": {},
+    "TeamAccessPolicies": {},
+    "EdgeID": "edge-def456",
+    "EdgeKey": "agenttunnel|edge-def456|https://jabba.lan:9444|jabba.lan:8000",
+    "TagIds": [],
+    "Tags": null,
+    "Kubernetes": {
+      "Snapshots": []
+    }
+  }
+]

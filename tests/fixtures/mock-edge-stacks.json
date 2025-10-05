@@ -1,0 +1,50 @@
+[
+  {
+    "Id": 1,
+    "Name": "mcp-laptop",
+    "EdgeGroups": [1],
+    "DeploymentType": 0,
+    "Status": {
+      "1": {
+        "Type": 0,
+        "Error": "",
+        "EndpointId": 5
+      }
+    },
+    "ProjectPath": "/data/compose/edge/1",
+    "EntryPoint": "docker-compose.yml",
+    "GitConfig": {
+      "URL": "https://github.com/unplugged12/mcp-stacks",
+      "ReferenceName": "refs/heads/main",
+      "ConfigFilePath": "stacks/laptop/docker-compose.yml",
+      "Authentication": null
+    },
+    "CreationDate": 1704067200,
+    "UpdateDate": 1704153600,
+    "UpdatedBy": "admin"
+  },
+  {
+    "Id": 2,
+    "Name": "mcp-laptop-secondary",
+    "EdgeGroups": [1],
+    "DeploymentType": 0,
+    "Status": {
+      "1": {
+        "Type": 0,
+        "Error": "",
+        "EndpointId": 6
+      }
+    },
+    "ProjectPath": "/data/compose/edge/2",
+    "EntryPoint": "docker-compose.yml",
+    "GitConfig": {
+      "URL": "https://github.com/unplugged12/mcp-stacks",
+      "ReferenceName": "refs/heads/main",
+      "ConfigFilePath": "stacks/laptop/docker-compose.yml",
+      "Authentication": null
+    },
+    "CreationDate": 1704067200,
+    "UpdateDate": 1704153600,
+    "UpdatedBy": "admin"
+  }
+]

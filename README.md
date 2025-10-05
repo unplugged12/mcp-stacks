@@ -1,5 +1,8 @@
 # MCP Stacks - GitOps Deployment for Portainer
 
+[![CI Pipeline](https://github.com/unplugged12/mcp-stacks/actions/workflows/ci.yml/badge.svg)](https://github.com/unplugged12/mcp-stacks/actions/workflows/ci.yml)
+[![Deploy](https://github.com/unplugged12/mcp-stacks/actions/workflows/deploy.yml/badge.svg)](https://github.com/unplugged12/mcp-stacks/actions/workflows/deploy.yml)
+
 GitOps-style deployment of MCP (Model Context Protocol) servers across multiple Docker hosts managed by Portainer CE.
 
 **Portainer Server:** `https://jabba.lan:9444` (Edge tunnel on port 8000)
@@ -14,7 +17,9 @@ GitOps-style deployment of MCP (Model Context Protocol) servers across multiple 
 - [MCP Servers](#mcp-servers)
 - [Secrets Management](#secrets-management)
 - [Deployment Workflows](#deployment-workflows)
+- [CI/CD Pipeline](#cicd-pipeline)
 - [Adding New MCP Servers](#adding-new-mcp-servers)
+- [Production Features](#production-features)
 - [Triggering Redeployments](#triggering-redeployments)
 - [Off-LAN Access](#off-lan-access)
 - [Troubleshooting](#troubleshooting)
@@ -265,6 +270,76 @@ Portainer stores these in its database (not in Git).
 
 ---
 
+## CI/CD Pipeline
+
+This repository uses GitHub Actions for automated testing, security scanning, and deployment orchestration.
+
+### Pipeline Overview
+
+The CI/CD pipeline provides:
+- **Automated Linting**: PSScriptAnalyzer for PowerShell, shellcheck for Bash
+- **Security Scanning**: SAST analysis with Trivy and Semgrep
+- **Validation**: Docker Compose syntax checking and script testing
+- **SBOM Generation**: Software Bill of Materials for dependency tracking
+- **Deployment Automation**: Manual deployment workflows with validation
+
+### CI Pipeline
+
+Runs automatically on every push and pull request:
+
+```bash
+# View CI status
+gh workflow view ci.yml
+
+# Manually trigger CI
+gh workflow run ci.yml
+```
+
+**Pipeline Stages:**
+1. Lint PowerShell and Bash scripts
+2. Security SAST scanning (Trivy + Semgrep)
+3. Validate Docker Compose files
+4. Generate SBOM and scan for vulnerabilities
+5. Test scripts on Windows and Linux runners
+
+### Deployment Workflow
+
+Manual deployment with validation:
+
+```bash
+# Deploy to desktop environments
+gh workflow run deploy.yml -f environment=desktop
+
+# Deploy to laptop environments
+gh workflow run deploy.yml -f environment=laptop
+
+# Deploy to all environments
+gh workflow run deploy.yml -f environment=all
+```
+
+**Note:** For Portainer CE, the deployment workflow provides detailed manual deployment instructions. Automatic API deployment requires the `PORTAINER_API_KEY` secret and is primarily informational for CE users.
+
+### Required GitHub Secrets
+
+Configure these secrets in repository settings for CI/CD:
+
+| Secret | Purpose | Required |
+|--------|---------|----------|
+| `HUB_USERNAME` | Docker Hub authentication | Yes |
+| `HUB_PAT_TOKEN` | Docker Hub PAT | Yes |
+| `CONTEXT7_TOKEN` | Context7 service auth | Yes |
+| `PORTAINER_API_KEY` | Portainer API access (optional) | No |
+
+See [docs/SECRETS.md](docs/SECRETS.md) for detailed secrets configuration.
+
+### Documentation
+
+For comprehensive pipeline documentation, see:
+- [docs/PIPELINE.md](docs/PIPELINE.md) - Complete pipeline architecture and usage
+- [docs/SECRETS.md](docs/SECRETS.md) - Secrets management and rotation
+
+---
+
 ## Adding New MCP Servers
 
 ### Step 1: Update Compose Files
@@ -313,6 +388,131 @@ git push origin main
 # Verify after deploy
 .\scripts\validation\post-deploy-check.ps1 -StackPrefix "mcp"
 ```
+
+---
+
+## Production Features
+
+### Health Checks
+
+All MCP services include container-level health checks:
+
+- **Health Check Type:** TCP connectivity test to port 3000
+- **Interval:** Every 30 seconds
+- **Retries:** 3 consecutive failures before marking unhealthy
+- **Start Period:** 40-60 seconds (varies by service)
+
+**View health status:**
+```powershell
+docker ps  # Shows "(healthy)" or "(unhealthy)" status
+docker inspect <container-name> --format='{{.State.Health.Status}}'
+```
+
+**Health check details:**
+```powershell
+docker inspect <container-name> --format='{{json .State.Health}}' | ConvertFrom-Json
+```
+
+### Resource Limits
+
+Resource limits prevent any single service from consuming excessive resources:
+
+| Service | CPU Limit | Memory Limit | CPU Reservation | Memory Reservation |
+|---------|-----------|--------------|-----------------|-------------------|
+| context7 | 1.0 core | 512MB | 0.25 core | 128MB |
+| dockerhub | 0.5 core | 256MB | 0.1 core | 64MB |
+| playwright | 2.0 cores | 2GB | 0.5 core | 256MB |
+| sequentialthinking | 1.0 core | 512MB | 0.25 core | 128MB |
+
+**Monitor resource usage:**
+```powershell
+docker stats
+```
+
+### Logging Configuration
+
+All services use structured JSON logging with automatic rotation:
+
+- **Max log size per file:** 10MB
+- **Max files retained:** 3
+- **Total max storage:** 30MB per container
+
+**View logs:**
+```powershell
+docker logs <container-name> --tail 100 --follow
+docker logs <container-name> --since 1h
+docker logs <container-name> --timestamps
+```
+
+### Restart Policies
+
+All services use `restart: unless-stopped` policy:
+- Automatically restart on failure
+- Restart after Docker daemon restarts
+- Don't restart if manually stopped
+
+### Service Labels
+
+Labels enable filtering and observability:
+- `com.mcp.service` - Service identifier
+- `com.mcp.version` - Image version
+- `com.mcp.environment` - Environment (production/staging/dev)
+- `com.mcp.deployment` - Deployment type (agent/edge)
+
+**Filter by label:**
+```powershell
+docker ps --filter "label=com.mcp.service=playwright"
+docker ps --filter "label=com.mcp.deployment=edge"
+```
+
+### Smoke Testing
+
+Run comprehensive health validation after deployment:
+
+```powershell
+.\scripts\smoke-test.ps1 -StackPrefix "mcp"
+```
+
+**Tests performed:**
+- Docker daemon availability
+- Container discovery
+- Running status verification
+- Health check status
+- Resource limits enforcement
+- Environment variable loading
+- Logging configuration
+- Recent log output analysis
+- Port exposure validation
+- Restart policy verification
+- Container uptime tracking
+- Resource usage snapshot
+
+**Options:**
+```powershell
+# Verbose output
+.\scripts\smoke-test.ps1 -StackPrefix "mcp" -Verbose
+
+# Custom timeout
+.\scripts\smoke-test.ps1 -StackPrefix "mcp" -Timeout 180
+
+# Skip health checks
+.\scripts\smoke-test.ps1 -StackPrefix "mcp" -SkipHealthCheck
+```
+
+### Observability & Monitoring
+
+For comprehensive observability strategy including OpenTelemetry instrumentation, metrics collection, and distributed tracing, see:
+
+**[observability/README.md](observability/README.md)**
+
+Topics covered:
+- OpenTelemetry SDK integration for Node.js MCP servers
+- Metrics collection with Prometheus
+- Log aggregation with Loki
+- Distributed tracing with Jaeger
+- Alerting with Alertmanager
+- Grafana dashboards
+- Container metrics with cAdvisor
 
 ---
 

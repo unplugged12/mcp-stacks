@@ -1,0 +1,66 @@
+[
+  {
+    "Id": 1,
+    "Name": "mcp-desktop",
+    "Type": 2,
+    "EndpointId": 1,
+    "Status": 1,
+    "ProjectPath": "/data/compose/1",
+    "EntryPoint": "docker-compose.yml",
+    "Env": [
+      {
+        "name": "HUB_USERNAME",
+        "value": "testuser"
+      },
+      {
+        "name": "HUB_PAT_TOKEN",
+        "value": "***"
+      },
+      {
+        "name": "CONTEXT7_TOKEN",
+        "value": "***"
+      }
+    ],
+    "GitConfig": {
+      "URL": "https://github.com/unplugged12/mcp-stacks",
+      "ReferenceName": "refs/heads/main",
+      "ConfigFilePath": "stacks/desktop/docker-compose.yml",
+      "Authentication": null
+    },
+    "AutoUpdate": {
+      "Interval": "5m",
+      "Webhook": null
+    },
+    "CreationDate": 1704067200,
+    "UpdateDate": 1704153600,
+    "UpdatedBy": "admin"
+  },
+  {
+    "Id": 2,
+    "Name": "mcp-desktop-alternate",
+    "Type": 2,
+    "EndpointId": 2,
+    "Status": 1,
+    "ProjectPath": "/data/compose/2",
+    "EntryPoint": "docker-compose.yml",
+    "Env": [
+      {
+        "name": "HUB_USERNAME",
+        "value": "testuser"
+      }
+    ],
+    "GitConfig": {
+      "URL": "https://github.com/unplugged12/mcp-stacks",
+      "ReferenceName": "refs/heads/main",
+      "ConfigFilePath": "stacks/desktop/docker-compose.yml",
+      "Authentication": null
+    },
+    "AutoUpdate": {
+      "Interval": "5m",
+      "Webhook": null
+    },
+    "CreationDate": 1704067200,
+    "UpdateDate": 1704153600,
+    "UpdatedBy": "admin"
+  }
+]
