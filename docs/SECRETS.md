@@ -188,15 +188,15 @@ Uses these secrets for deployment:
 
 ## Environment Variables vs Secrets
 
-| Use Case | GitHub Secrets | Portainer Env Vars | Edge Config |
-|----------|---------------|-------------------|-------------|
+| Use Case | GitHub Secrets | Agent Env File | Edge Config |
+|----------|---------------|----------------|-------------|
 | CI/CD Pipeline | ✅ | ❌ | ❌ |
 | Desktop Stacks (Agent) | ❌ | ✅ | ❌ |
 | Laptop Stacks (Edge) | ❌ | ❌ | ✅ |
 
 **Key Principle:**
 - **GitHub Secrets**: For CI/CD automation only
-- **Portainer Stack Env Vars**: For Agent-based deployments (desktops)
+- **Agent Env File (`/run/mcp/mcp.env`)**: For Agent-based deployments (desktops)
 - **Portainer Edge Config**: For Edge-based deployments (laptops)
 
 ## Support

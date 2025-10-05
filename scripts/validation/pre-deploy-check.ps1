@@ -25,7 +25,7 @@ $passedChecks = 0
 $failedChecks = 0
 
 # Check 1: Docker availability
-Write-Host "[1/6] Checking Docker..." -ForegroundColor Cyan
+Write-Host "[1/7] Checking Docker..." -ForegroundColor Cyan
 try {
     $dockerVersion = docker --version
     Write-Host "  ✓ Docker available: $dockerVersion" -ForegroundColor Green
@@ -36,7 +36,7 @@ try {
 }
 
 # Check 2: Portainer reachability (UI on 9444)
-Write-Host "[2/6] Checking Portainer UI (9444)..." -ForegroundColor Cyan
+Write-Host "[2/7] Checking Portainer UI (9444)..." -ForegroundColor Cyan
 try {
     # Handle SSL certificate validation for both PowerShell 5.1 and 7+
     if ($PSVersionTable.PSVersion.Major -ge 6) {
@@ -61,7 +61,7 @@ try {
 }
 
 # Check 3: Portainer Edge tunnel (8000)
-Write-Host "[3/6] Checking Portainer Edge tunnel (8000)..." -ForegroundColor Cyan
+Write-Host "[3/7] Checking Portainer Edge tunnel (8000)..." -ForegroundColor Cyan
 try {
     $tcpTest = Test-NetConnection -ComputerName jabba.lan -Port 8000 -InformationLevel Quiet
     if ($tcpTest) {
@@ -76,8 +76,52 @@ try {
     $failedChecks++
 }
 
-# Check 4: Compose file syntax
-Write-Host "[4/6] Validating compose files..." -ForegroundColor Cyan
+# Check 4: Agent env file presence
+Write-Host "[4/7] Validating agent env file..." -ForegroundColor Cyan
+if ($StackType -in @("desktop", "both")) {
+    $envFilePath = if ($env:MCP_ENV_FILE) { $env:MCP_ENV_FILE } else { "/run/mcp/mcp.env" }
+    $checkPassed = $true
+
+    if (-not (Test-Path -Path $envFilePath)) {
+        Write-Host "  ✗ Env file not found: $envFilePath" -ForegroundColor Red
+        Write-Host "    Run scripts/install/configure-agent-env.{ps1,sh} on the agent host." -ForegroundColor Red
+        $checkPassed = $false
+    } else {
+        Write-Host "  ✓ Found env file at $envFilePath" -ForegroundColor Green
+        try {
+            $content = Get-Content -Path $envFilePath -ErrorAction Stop
+            $requiredKeys = @("HUB_USERNAME", "HUB_PAT_TOKEN", "CONTEXT7_TOKEN")
+            $missingKeys = @()
+            foreach ($key in $requiredKeys) {
+                if (-not ($content -match "^$key=")) {
+                    $missingKeys += $key
+                }
+            }
+
+            if ($missingKeys.Count -gt 0) {
+                Write-Host "  ✗ Missing keys in env file: $($missingKeys -join ', ')" -ForegroundColor Red
+                $checkPassed = $false
+            } else {
+                Write-Host "  ✓ Required keys present" -ForegroundColor Green
+            }
+        } catch {
+            Write-Host "  ✗ Unable to read env file: $($_.Exception.Message)" -ForegroundColor Red
+            $checkPassed = $false
+        }
+    }
+
+    if ($checkPassed) {
+        $passedChecks++
+    } else {
+        $failedChecks++
+    }
+} else {
+    Write-Host "  ✓ Stack type '$StackType' does not require an agent env file" -ForegroundColor Green
+    $passedChecks++
+}
+
+# Check 5: Compose file syntax
+Write-Host "[5/7] Validating compose files..." -ForegroundColor Cyan
 $scriptDir = Split-Path -Parent $PSCommandPath
 $repoRoot = Split-Path -Parent (Split-Path -Parent $scriptDir)
 
@@ -107,8 +151,8 @@ if ($composeValid) {
     $failedChecks++
 }
 
-# Check 5: MCP images availability
-Write-Host "[5/6] Checking MCP image availability..." -ForegroundColor Cyan
+# Check 6: MCP images availability
+Write-Host "[6/7] Checking MCP image availability..." -ForegroundColor Cyan
 $images = @(
     "mcp/context7:latest",
     "mcp/dockerhub:latest",
@@ -133,8 +177,8 @@ if ($imagesValid) {
     $failedChecks++
 }
 
-# Check 6: Git repo status
-Write-Host "[6/6] Checking Git repository..." -ForegroundColor Cyan
+# Check 7: Git repo status
+Write-Host "[7/7] Checking Git repository..." -ForegroundColor Cyan
 $pushedLocation = $false
 try {
     Push-Location $repoRoot

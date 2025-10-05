@@ -33,7 +33,7 @@ This repository manages MCP server deployments using:
 
 - **GitOps**: Compose files stored in Git, auto-deployed via Portainer
 - **Multi-environment**: Separate configs for desktops (Agent) and laptops (Edge)
-- **Zero secrets in Git**: Edge Configs and Stack env vars for secrets
+- **Zero secrets in Git**: Edge Configs and agent env files for secrets
 - **Automated workflows**: Scripts for install, validation, and rollback
 
 **Key Principle:** **Never commit secrets to Git**
@@ -46,7 +46,7 @@ This repository manages MCP server deployments using:
 
 | Type | Endpoints | Connection | GitOps | Secrets Delivery |
 |------|-----------|------------|--------|------------------|
-| **Agent** | Desktops, always-on hosts | Direct (port 9001) | Auto-sync on Git commit | Stack env vars in Portainer |
+| **Agent** | Desktops, always-on hosts | Direct (port 9001) | Auto-sync on Git commit | Host env file (`/run/mcp/mcp.env`) |
 | **Edge** | Laptops, roaming hosts | Tunnel (port 8000) | Manual redeploy (CE limitation) | Edge Config (.env file) |
 
 ### Repository Structure
@@ -63,6 +63,7 @@ mcp-stacks/
 ├── scripts/
 │   ├── build-edge-config.{ps1,sh}    # Create Edge Config bundle
 │   ├── install/
+│   │   ├── configure-agent-env.{ps1,sh} # Create /run/mcp/mcp.env on agents
 │   │   ├── install-agent.{ps1,sh}    # Install Portainer Agent (desktops)
 │   │   ├── uninstall-agent.{ps1,sh}
 │   │   ├── install-edge-agent.{ps1,sh}  # Install Edge Agent (laptops)
@@ -141,9 +142,15 @@ cd mcp-stacks
 #   Edge Configurations → Create → Upload ZIP → Target: laptops group
 ```
 
-**For Desktops (Stack Env Vars):**
-- Add via Portainer UI when deploying the stack (step 5)
-- Or update existing stack: **Stacks** → **mcp-desktop** → **Editor** → **Environment variables**
+**For Desktops (Agent env file):**
+```bash
+sudo ./scripts/install/configure-agent-env.sh
+# or, with PowerShell 7+
+sudo pwsh ./scripts/install/configure-agent-env.ps1
+```
+- Run on each agent host before the first deployment.
+- Creates `/run/mcp/mcp.env` with the required secrets and locks down permissions.
+- Redeploy the stack after updating credentials so containers reload the values.
 
 ### 5. Deploy Stacks from Git
 
@@ -155,12 +162,7 @@ cd mcp-stacks
    - **Repository URL:** `https://github.com/unplugged12/mcp-stacks`
    - **Reference:** `refs/heads/main`
    - **Compose path:** `stacks/desktop/docker-compose.yml`
-4. **Environment variables** (add secrets):
-   ```
-   HUB_USERNAME=<your-dockerhub-username>
-   HUB_PAT_TOKEN=<your-dockerhub-pat>
-   CONTEXT7_TOKEN=<your-context7-token>
-   ```
+4. (Optional) Define `MCP_ENV_FILE` if you used a non-default path. Leave blank to use `/run/mcp/mcp.env` created by the setup script.
 5. Enable **GitOps updates** (automatic polling)
 6. Deploy
 
@@ -198,7 +200,7 @@ All images are available on Docker Hub under the `mcp/` organization.
 
 1. **Never commit secrets to Git** (protected by `.gitignore`)
 2. **Edge (laptops):** Secrets delivered via Edge Config `.env` file
-3. **Agent (desktops):** Secrets stored as Stack env vars in Portainer DB
+3. **Agent (desktops):** Secrets stored in `/run/mcp/mcp.env` on each host
 4. **Portainer DB:** Consider enabling encryption at rest (Portainer settings)
 
 ### Edge Config Delivery (Laptops)
@@ -369,7 +371,8 @@ services:
 - Rebuild and redeploy Edge Config
 
 **For Agent (desktops):**
-- Add env vars in Portainer UI (Stacks → Edit → Environment variables)
+- Update `scripts/install/configure-agent-env.{ps1,sh}` to prompt for the new secret
+- Re-run the script on each agent host to refresh `/run/mcp/mcp.env`
 
 ### Step 3: Validate and Deploy
 
@@ -652,7 +655,7 @@ docker login
 docker pull mcp/context7:latest
 ```
 
-**For stack deployments:** Ensure credentials are in secrets (Edge Config or Stack env vars)
+**For stack deployments:** Ensure credentials are in secrets (Edge Config or agent env file)
 
 ### GitOps Not Auto-Syncing (Agent)
 
@@ -677,9 +680,12 @@ docker pull mcp/context7:latest
    ```
 
 **Agent (desktops):**
-1. Check Stack env vars:
-   - Portainer UI → Stacks → Select stack → Editor → Environment variables
-2. Inspect container environment:
+1. Verify the env file on the host:
+   ```bash
+   sudo cat /run/mcp/mcp.env
+   ```
+2. If you used a custom path, confirm the stack's `MCP_ENV_FILE` variable matches the location.
+3. Inspect container environment:
    ```bash
    docker inspect <container> --format='{{.Config.Env}}'
    ```
@@ -705,6 +711,8 @@ docker pull mcp/context7:latest
 |--------|---------|----------|
 | `scripts/build-edge-config.ps1` | Build Edge Config bundle with secrets | PowerShell |
 | `scripts/build-edge-config.sh` | Build Edge Config bundle with secrets | Bash |
+| `scripts/install/configure-agent-env.ps1` | Create `/run/mcp/mcp.env` on agent hosts | PowerShell |
+| `scripts/install/configure-agent-env.sh` | Create `/run/mcp/mcp.env` on agent hosts | Bash |
 
 ### Deployment & Management
 
@@ -728,7 +736,7 @@ docker pull mcp/context7:latest
 
 When adding new MCP servers or making infrastructure changes:
 
-1. **Never commit secrets** - Use Edge Configs or Stack env vars
+1. **Never commit secrets** - Use Edge Configs or agent env files
 2. **Validate before commit:**
    ```powershell
    .\scripts\validation\pre-deploy-check.ps1
