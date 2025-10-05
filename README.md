@@ -79,6 +79,52 @@ mcp-stacks/
 
 ---
 
+## Hardware Requirements
+
+### Minimum Requirements
+
+The MCP stack has been tuned for resource-constrained environments, specifically the **UGREEN DXP 2800** NAS:
+
+- **CPU:** Intel N100 (4 cores) or equivalent
+- **RAM:** 8-16GB (shared with other workloads like 4K transcoding)
+- **Storage:** 10GB free space for Docker images and logs
+
+### Resource Allocation
+
+Current resource limits are conservative to accommodate concurrent workloads (e.g., 4K video transcoding):
+
+| Service | CPU Limit | Memory Limit | Notes |
+|---------|-----------|--------------|-------|
+| context7 | 0.5 core | 256MB | Reduced from 1.0/512MB |
+| dockerhub | 0.25 core | 128MB | Reduced from 0.5/256MB |
+| playwright | 1.0 core | 1GB | Reduced from 2.0/2GB (browser automation) |
+| sequentialthinking | 0.5 core | 256MB | Reduced from 1.0/512MB |
+| **Total** | **2.25 cores** | **1.64GB** | Leaves ~1.75 cores for transcoding/OS |
+
+### Tuning for Different Hardware
+
+If you have more powerful hardware or dedicated systems, you can increase limits:
+
+**High-Performance Desktop (8+ cores, 32GB+ RAM):**
+```yaml
+# In stacks/common/docker-compose.yml or stacks/laptop/docker-compose.yml
+deploy:
+  resources:
+    limits:
+      cpus: '2.0'  # Increase from 0.5
+      memory: 1G   # Increase from 256M
+```
+
+**Dedicated NAS Without Transcoding:**
+- Can restore original limits (double the current values)
+- Playwright can go back to 2.0 CPUs / 2GB for better browser performance
+
+**Lower-End Hardware (2-core systems):**
+- Consider running only essential services (disable playwright if not needed)
+- Reduce limits further or stagger service usage
+
+---
+
 ## Quick Start
 
 ### Prerequisites
@@ -435,14 +481,17 @@ docker inspect <container-name> --format='{{json .State.Health}}' | ConvertFrom-
 
 ### Resource Limits
 
-Resource limits prevent any single service from consuming excessive resources:
+Resource limits prevent any single service from consuming excessive resources. Current limits are tuned for the UGREEN DXP 2800 NAS with concurrent 4K transcoding workload:
 
 | Service | CPU Limit | Memory Limit | CPU Reservation | Memory Reservation |
 |---------|-----------|--------------|-----------------|-------------------|
-| context7 | 1.0 core | 512MB | 0.25 core | 128MB |
-| dockerhub | 0.5 core | 256MB | 0.1 core | 64MB |
-| playwright | 2.0 cores | 2GB | 0.5 core | 256MB |
-| sequentialthinking | 1.0 core | 512MB | 0.25 core | 128MB |
+| context7 | 0.5 core | 256MB | 0.25 core | 128MB |
+| dockerhub | 0.25 core | 128MB | 0.1 core | 64MB |
+| playwright | 1.0 core | 1GB | 0.5 core | 256MB |
+| sequentialthinking | 0.5 core | 256MB | 0.25 core | 128MB |
+| **Total** | **2.25 cores** | **1.64GB** | **1.1 cores** | **576MB** |
+
+See the [Hardware Requirements](#hardware-requirements) section for tuning guidance.
 
 **Monitor resource usage:**
 ```powershell

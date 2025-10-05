@@ -15,12 +15,13 @@ services:
       retries: 3
       start_period: 40s
 
-    # Resource limits
+    # Resource limits - tuned for UGREEN DXP 2800 (Intel N100, 4 cores) with 4K transcoding workload
+    # Total across all services: 2.25 CPUs + 1.64GB (leaves headroom for transcoding)
     deploy:
       resources:
         limits:
-          cpus: '1.0'
-          memory: 512M
+          cpus: '0.5'
+          memory: 256M
         reservations:
           cpus: '0.25'
           memory: 128M
@@ -60,8 +61,8 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '0.5'
-          memory: 256M
+          cpus: '0.25'
+          memory: 128M
         reservations:
           cpus: '0.1'
           memory: 64M
@@ -97,6 +98,7 @@ services:
       start_period: 60s  # Playwright needs more time to start
 
     # Resource limits (Playwright needs more resources for browser automation)
+    # Reduced from 2.0 CPUs/2GB to accommodate 4K transcoding on resource-constrained NAS
     deploy:
       resources:
         limits:
@@ -148,8 +150,8 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '1.0'
-          memory: 512M
+          cpus: '0.5'
+          memory: 256M
         reservations:
           cpus: '0.25'
           memory: 128M
