@@ -71,10 +71,10 @@ echo ""
 echo -e "${YELLOW}Enter values for secrets (leave blank to skip):${NC}"
 echo ""
 
-read -p "Docker Hub Username: " HUB_USERNAME
-read -s -p "Docker Hub PAT Token: " HUB_PAT_TOKEN
+read -r -p "Docker Hub Username: " HUB_USERNAME
+read -r -s -p "Docker Hub PAT Token: " HUB_PAT_TOKEN
 echo ""
-read -s -p "Context7 API Token: " CONTEXT7_TOKEN
+read -r -s -p "Context7 API Token: " CONTEXT7_TOKEN
 echo ""
 
 # Build final env file
