@@ -3,6 +3,9 @@ services:
     image: mcp/context7:latest
     restart: unless-stopped
     env_file: /var/edge/configs/mcp.env
+    profiles:
+      - default
+      - lite
 
     # Health check configuration
     healthcheck:
@@ -41,6 +44,9 @@ services:
     image: mcp/dockerhub:latest
     restart: unless-stopped
     env_file: /var/edge/configs/mcp.env
+    profiles:
+      - default
+      - lite
 
     # Health check configuration
     healthcheck:
@@ -79,6 +85,8 @@ services:
     image: mcp/mcp-playwright:latest
     restart: unless-stopped
     env_file: /var/edge/configs/mcp.env
+    profiles:
+      - default
 
     # Health check configuration
     healthcheck:
@@ -92,10 +100,10 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '2.0'
-          memory: 2G
+          cpus: '1.0'
+          memory: 1G
         reservations:
-          cpus: '0.5'
+          cpus: '0.25'
           memory: 256M
 
     # Logging configuration
@@ -118,12 +126,15 @@ services:
       - seccomp:unconfined
 
     # Shared memory size for Chromium
-    shm_size: 2gb
+    shm_size: 1gb
 
   mcp-sequentialthinking:
     image: mcp/sequentialthinking:latest
     restart: unless-stopped
     env_file: /var/edge/configs/mcp.env
+    profiles:
+      - default
+      - lite
 
     # Health check configuration
     healthcheck:
