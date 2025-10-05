@@ -268,6 +268,23 @@ Portainer stores these in its database (not in Git).
 # Note: Will display instructions for CE users
 ```
 
+### Selecting Lightweight Profiles in Portainer
+
+Portainer honors the Compose `profiles` declared in the stack files:
+
+- **Core services** (`mcp-context7`, `mcp-dockerhub`, `mcp-sequentialthinking`) run under both the `default` and `lite` profiles.
+- **Browser automation** (`mcp-playwright`) is only part of the `default` profile.
+
+To deploy a lightweight stack on laptops, NAS devices, or other constrained hosts:
+
+1. Portainer UI → **Stacks** → Select the stack → **Editor**.
+2. In the **Environment variables** panel add `COMPOSE_PROFILES=lite` (or edit the existing variable).
+3. Click **Update the stack** to redeploy.
+
+With `COMPOSE_PROFILES=lite`, Portainer omits the Playwright container entirely and applies the reduced resource requests (1 vCPU / 1 GB RAM / 1 GB `shm_size`). If you later need browser automation, clear the variable or set `COMPOSE_PROFILES=default` to restore the full profile.
+
+> **Tip for NAS owners:** Skip Playwright unless the NAS has spare CPU and RAM headroom; the lite profile keeps the core MCP services responsive without launching a Chromium worker.
+
 ---
 
 ## CI/CD Pipeline
