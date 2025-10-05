@@ -151,6 +151,9 @@ jobs:
           echo "CONTEXT7_TOKEN=testtoken" >> .env.test
           echo "ENVIRONMENT=ci" >> .env.test
 
+          # Create dummy secret file referenced by MCP_ENV_FILE so docker compose validation succeeds
+          printf "# dummy MCP env file for CI validation\n" > /tmp/mcp.env
+
           # Validate compose file syntax
           docker compose --env-file .env.test config > /dev/null
 
