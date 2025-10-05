@@ -68,7 +68,7 @@ function Write-Failure {
     Write-Host "  ✗ $Message" -ForegroundColor Red
 }
 
-function Write-Warning {
+function Write-ScriptWarning {
     param([string]$Message)
     Write-Host "  ⚠ $Message" -ForegroundColor Yellow
 }
@@ -237,7 +237,7 @@ if (-not $SkipHealthCheck) {
                 Write-Success "$containerName is healthy"
                 Record-Pass
             } elseif ($health -eq "starting") {
-                Write-Warning "$containerName is still starting (may need more time)"
+                Write-ScriptWarning "$containerName is still starting (may need more time)"
                 Record-Warning
             } else {
                 Write-Failure "$containerName is unhealthy (status: $health)"
@@ -251,7 +251,7 @@ if (-not $SkipHealthCheck) {
                 }
             }
         } else {
-            Write-Warning "$containerName has no health check configured"
+            Write-ScriptWarning "$containerName has no health check configured"
             Record-Warning
         }
     }
@@ -273,7 +273,7 @@ foreach ($container in $runningContainers) {
         Write-Success "$containerName has memory limit: ${memoryMB}MB"
         Record-Pass
     } else {
-        Write-Warning "$containerName has no memory limit set"
+        Write-ScriptWarning "$containerName has no memory limit set"
         Record-Warning
     }
 
@@ -282,7 +282,7 @@ foreach ($container in $runningContainers) {
         Write-Success "$containerName has CPU limit: $cpuCores cores"
         Record-Pass
     } else {
-        Write-Warning "$containerName has no CPU limit set"
+        Write-ScriptWarning "$containerName has no CPU limit set"
         Record-Warning
     }
 }
@@ -317,7 +317,7 @@ foreach ($container in $runningContainers) {
             }
         }
     } else {
-        Write-Warning "$containerName has no environment variables"
+        Write-ScriptWarning "$containerName has no environment variables"
         Record-Warning
     }
 }
@@ -343,7 +343,7 @@ foreach ($container in $runningContainers) {
             }
         }
     } else {
-        Write-Warning "$containerName has no log driver configured"
+        Write-ScriptWarning "$containerName has no log driver configured"
         Record-Warning
     }
 }
@@ -373,7 +373,7 @@ foreach ($container in $runningContainers) {
         $hasErrors = $false
         foreach ($pattern in $errorPatterns) {
             if ($logs -match $pattern) {
-                Write-Warning "$containerName logs contain '$pattern' messages"
+                Write-ScriptWarning "$containerName logs contain '$pattern' messages"
                 Record-Warning
                 $hasErrors = $true
             }
@@ -383,7 +383,7 @@ foreach ($container in $runningContainers) {
             Write-Info "  No obvious error patterns detected in recent logs"
         }
     } else {
-        Write-Warning "$containerName has no recent log output"
+        Write-ScriptWarning "$containerName has no recent log output"
         Record-Warning
     }
 }
@@ -422,11 +422,11 @@ foreach ($container in $runningContainers) {
             Write-Success "$containerName has restart policy: $restartPolicy"
             Record-Pass
         } else {
-            Write-Warning "$containerName has restart policy: $restartPolicy (recommended: unless-stopped)"
+            Write-ScriptWarning "$containerName has restart policy: $restartPolicy (recommended: unless-stopped)"
             Record-Warning
         }
     } else {
-        Write-Warning "$containerName has no restart policy set"
+        Write-ScriptWarning "$containerName has no restart policy set"
         Record-Warning
     }
 }
@@ -448,7 +448,7 @@ foreach ($container in $runningContainers) {
 
         # Warn if container recently restarted
         if ($uptime.TotalMinutes -lt 5) {
-            Write-Warning "Container was recently started (< 5 minutes ago)"
+            Write-ScriptWarning "Container was recently started (< 5 minutes ago)"
             Record-Warning
         }
     } else {
@@ -480,11 +480,11 @@ try {
             }
         }
     } else {
-        Write-Warning "Unable to collect resource statistics"
+        Write-ScriptWarning "Unable to collect resource statistics"
         Record-Warning
     }
 } catch {
-    Write-Warning "Resource usage collection failed: $($_.Exception.Message)"
+    Write-ScriptWarning "Resource usage collection failed: $($_.Exception.Message)"
     Record-Warning
 }
 
@@ -513,7 +513,7 @@ if ($failedTests -eq 0) {
 
     if ($warnings -gt 0) {
         Write-Host ""
-        Write-Warning "There are $warnings warnings. Review above for details."
+        Microsoft.PowerShell.Utility\Write-Warning "There are $warnings warnings. Review above for details."
     }
 
     exit 0
