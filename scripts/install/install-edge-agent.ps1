@@ -93,7 +93,54 @@ Write-Host ""
 Write-Host "Deploying Edge Agent..." -ForegroundColor Cyan
 Write-Host ""
 
-Invoke-Expression $DockerCommand
+$parseErrors = $null
+$tokens = [System.Management.Automation.PSParser]::Tokenize($DockerCommand, [ref]$parseErrors)
+
+if ($parseErrors -and $parseErrors.Count -gt 0) {
+    Write-Host "✗ Failed to parse Docker command" -ForegroundColor Red
+    foreach ($error in $parseErrors) {
+        Write-Host $error.Message -ForegroundColor Red
+    }
+    exit 1
+}
+
+if (-not $tokens -or $tokens.Count -eq 0) {
+    Write-Host "✗ Docker command is empty" -ForegroundColor Red
+    exit 1
+}
+
+$commandToken = $tokens | Where-Object { $_.Type -eq [System.Management.Automation.PSTokenType]::Command } | Select-Object -First 1
+
+if (-not $commandToken -or $commandToken.Content -ne 'docker') {
+    Write-Host "✗ Invalid command. Expected to start with 'docker'" -ForegroundColor Red
+    exit 1
+}
+
+$commandIndex = [Array]::IndexOf($tokens, $commandToken)
+
+if ($commandIndex -lt 0) {
+    Write-Host "✗ Failed to locate docker command tokens" -ForegroundColor Red
+    exit 1
+}
+
+$dockerArgs = @()
+$skipTokenTypes = @(
+    [System.Management.Automation.PSTokenType]::NewLine,
+    [System.Management.Automation.PSTokenType]::LineContinuation,
+    [System.Management.Automation.PSTokenType]::Whitespace,
+    [System.Management.Automation.PSTokenType]::EndOfStatement,
+    [System.Management.Automation.PSTokenType]::EndOfInput
+)
+
+for ($i = $commandIndex + 1; $i -lt $tokens.Count; $i++) {
+    $token = $tokens[$i]
+    if ($skipTokenTypes -contains $token.Type) {
+        continue
+    }
+    $dockerArgs += $token.Content
+}
+
+& docker @dockerArgs
 
 if ($LASTEXITCODE -eq 0) {
     Write-Host ""
