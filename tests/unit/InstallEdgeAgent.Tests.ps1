@@ -105,7 +105,8 @@ Describe "Install-Edge-Agent Script Tests" -Tag "Unit" {
     Context "Command Execution" {
         It "Should execute the docker command" {
             $content = Get-Content $script:ScriptPath -Raw
-            $content | Should -Match 'Invoke-Expression.*DockerCommand'
+            $content | Should -Match '\[System.Management.Automation.PSParser\]::Tokenize'
+            $content | Should -Match '& docker @dockerArgs'
         }
 
         It "Should verify edge agent deployment" {
