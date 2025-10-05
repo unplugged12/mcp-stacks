@@ -1,0 +1,28 @@
+server:
+  http_listen_port: 9080
+  grpc_listen_port: 0
+
+positions:
+  filename: /tmp/positions.yaml
+
+clients:
+  - url: ${LOKI_URL}
+    tenant_id: ${LOKI_TENANT_ID}
+    batchwait: 5s
+    timeout: 10s
+
+scrape_configs:
+  - job_name: docker-logs
+    static_configs:
+      - targets: [localhost]
+        labels:
+          job: docker
+          __path__: /var/lib/docker/containers/*/*-json.log
+          environment: ${ENVIRONMENT}
+  - job_name: syslog
+    static_configs:
+      - targets: [localhost]
+        labels:
+          job: syslog
+          __path__: /var/log/*.log
+          environment: ${ENVIRONMENT}

@@ -1,0 +1,47 @@
+version: "3.9"
+
+services:
+  telegraf:
+    image: telegraf:1.28
+    container_name: monitoring-lite-telegraf
+    restart: unless-stopped
+    network_mode: host
+    environment:
+      - HOST_ETC=/hostfs/etc
+      - HOST_PROC=/hostfs/proc
+      - HOST_SYS=/hostfs/sys
+      - HOST_VAR=/hostfs/var
+      - HOST_RUN=/hostfs/run
+      - ENVIRONMENT=${ENVIRONMENT:-nas}
+      - INFLUX_REMOTE_WRITE_URL=${INFLUX_REMOTE_WRITE_URL}
+      - INFLUX_TOKEN=${INFLUX_TOKEN}
+      - INFLUX_ORG=${INFLUX_ORG}
+      - INFLUX_BUCKET=${INFLUX_BUCKET}
+    volumes:
+      - /:/hostfs:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro
+
+  promtail:
+    image: grafana/promtail:2.9.5
+    container_name: monitoring-lite-promtail
+    restart: unless-stopped
+    command: -config.file=/etc/promtail/config.yml
+    environment:
+      - LOKI_URL=${LOKI_URL}
+      - LOKI_TENANT_ID=${LOKI_TENANT_ID:-}
+      - ENVIRONMENT=${ENVIRONMENT:-nas}
+    volumes:
+      - /var/log:/var/log:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - ./promtail/config.yml:/etc/promtail/config.yml:ro
+      - promtail-positions:/tmp
+    logging:
+      driver: json-file
+      options:
+        max-size: "5m"
+        max-file: "3"
+
+volumes:
+  promtail-positions:
+    driver: local
