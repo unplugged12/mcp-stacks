@@ -25,6 +25,19 @@ echo -e "${CYAN}🔧 MCP Edge Config Bundle Builder${NC}"
 echo -e "${CYAN}=================================${NC}"
 echo ""
 
+# Check for zip command
+if ! command -v zip &> /dev/null; then
+    echo -e "${RED}✗ 'zip' command not found${NC}"
+    echo -e "${YELLOW}Please install zip:${NC}"
+    echo -e "${NC}  macOS:  brew install zip${NC}"
+    echo -e "${NC}  Ubuntu: sudo apt-get install zip${NC}"
+    echo -e "${NC}  RHEL:   sudo yum install zip${NC}"
+    exit 1
+fi
+
+# Create edge-configs directory if it doesn't exist
+mkdir -p "$EDGE_CONFIG_DIR"
+
 # Cleanup on exit
 trap 'rm -rf "$TEMP_DIR"' EXIT
 

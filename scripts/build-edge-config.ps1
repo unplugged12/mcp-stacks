@@ -25,8 +25,9 @@ Write-Host "🔧 MCP Edge Config Bundle Builder" -ForegroundColor Cyan
 Write-Host "=================================" -ForegroundColor Cyan
 Write-Host ""
 
-# Create temp directory
+# Create directories if they don't exist
 New-Item -ItemType Directory -Path $tempDir -Force | Out-Null
+New-Item -ItemType Directory -Path $edgeConfigDir -Force | Out-Null
 Write-Host "✓ Created temp directory: $tempDir" -ForegroundColor Green
 
 # Template env file

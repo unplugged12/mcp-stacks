@@ -69,7 +69,7 @@ if ($isWindows) {
         --name portainer_agent `
         --restart=always `
         -p "${AgentPort}:9001" `
-        -v //./pipe/docker_engine://./pipe/docker_engine `
+        -v "\\.\pipe\docker_engine:\\.\pipe\docker_engine" `
         portainer/agent:latest
 } else {
     # Linux/macOS: use docker.sock

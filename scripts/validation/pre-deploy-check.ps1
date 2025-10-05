@@ -38,7 +38,16 @@ try {
 # Check 2: Portainer reachability (UI on 9444)
 Write-Host "[2/6] Checking Portainer UI (9444)..." -ForegroundColor Cyan
 try {
-    $response = Invoke-WebRequest -Uri "https://jabba.lan:9444" -SkipCertificateCheck -TimeoutSec 5 -UseBasicParsing
+    # Handle SSL certificate validation for both PowerShell 5.1 and 7+
+    if ($PSVersionTable.PSVersion.Major -ge 6) {
+        $response = Invoke-WebRequest -Uri "https://jabba.lan:9444" -SkipCertificateCheck -TimeoutSec 5 -UseBasicParsing
+    } else {
+        # PowerShell 5.1 workaround
+        $originalCallback = [System.Net.ServicePointManager]::ServerCertificateValidationCallback
+        [System.Net.ServicePointManager]::ServerCertificateValidationCallback = {$true}
+        $response = Invoke-WebRequest -Uri "https://jabba.lan:9444" -TimeoutSec 5 -UseBasicParsing
+        [System.Net.ServicePointManager]::ServerCertificateValidationCallback = $originalCallback
+    }
     if ($response.StatusCode -eq 200) {
         Write-Host "  ✓ Portainer UI reachable at https://jabba.lan:9444" -ForegroundColor Green
         $passedChecks++
@@ -74,10 +83,10 @@ $repoRoot = Split-Path -Parent (Split-Path -Parent $scriptDir)
 
 $composeFiles = @()
 if ($StackType -in @("desktop", "both")) {
-    $composeFiles += Join-Path $repoRoot "stacks\desktop\docker-compose.yml"
+    $composeFiles += Join-Path $repoRoot "stacks" | Join-Path -ChildPath "desktop" | Join-Path -ChildPath "docker-compose.yml"
 }
 if ($StackType -in @("laptop", "both")) {
-    $composeFiles += Join-Path $repoRoot "stacks\laptop\docker-compose.yml"
+    $composeFiles += Join-Path $repoRoot "stacks" | Join-Path -ChildPath "laptop" | Join-Path -ChildPath "docker-compose.yml"
 }
 
 $composeValid = $true
@@ -126,21 +135,30 @@ if ($imagesValid) {
 
 # Check 6: Git repo status
 Write-Host "[6/6] Checking Git repository..." -ForegroundColor Cyan
+$pushedLocation = $false
 try {
     Push-Location $repoRoot
-    $gitStatus = git status --porcelain
-    if ($gitStatus) {
-        Write-Host "  ⚠️  Uncommitted changes detected:" -ForegroundColor Yellow
-        Write-Host "$gitStatus" -ForegroundColor Gray
+    $pushedLocation = $true
+    $gitStatus = git status --porcelain 2>&1
+    if ($LASTEXITCODE -eq 0) {
+        if ($gitStatus) {
+            Write-Host "  ⚠️  Uncommitted changes detected:" -ForegroundColor Yellow
+            Write-Host "$gitStatus" -ForegroundColor Gray
+        } else {
+            Write-Host "  ✓ Git working tree clean" -ForegroundColor Green
+        }
+        $passedChecks++
     } else {
-        Write-Host "  ✓ Git working tree clean" -ForegroundColor Green
+        Write-Host "  ✗ Not a git repository" -ForegroundColor Red
+        $failedChecks++
     }
-    $passedChecks++
-    Pop-Location
 } catch {
-    Write-Host "  ✗ Not a git repository or git not available" -ForegroundColor Red
+    Write-Host "  ✗ Git not available or error: $($_.Exception.Message)" -ForegroundColor Red
     $failedChecks++
-    Pop-Location
+} finally {
+    if ($pushedLocation) {
+        Pop-Location
+    }
 }
 
 # Summary
