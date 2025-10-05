@@ -69,10 +69,16 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Install Docker
+      - name: Check Docker availability
+        shell: pwsh
         run: |
-          # Docker is pre-installed on Windows runners
-          docker --version
+          $dockerCmd = Get-Command docker -ErrorAction SilentlyContinue
+          if (-not $dockerCmd) {
+            Write-Warning "Docker executable not found. Skipping Docker version check."
+          }
+          else {
+            docker --version
+          }
 
       - name: Run pre-deployment validation
         shell: pwsh

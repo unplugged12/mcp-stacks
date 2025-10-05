@@ -96,7 +96,7 @@ Automated continuous integration that validates code quality, security, and func
 - **Runner:** Windows Latest
 - **Dependencies:** Lint PowerShell
 - **Action:** Validates PowerShell script syntax and execution
-- **Checks:** Docker availability, script parsing
+- **Checks:** Attempts to detect Docker (logs a warning if unavailable) and parses scripts for syntax issues
 
 #### 4. Security SAST Scanning
 - **Runner:** Ubuntu Latest
