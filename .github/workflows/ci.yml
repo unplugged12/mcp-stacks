@@ -168,6 +168,7 @@ jobs:
           path: ./
           format: 'cyclonedx-json'
           output-file: 'sbom.json'
+          upload-artifact: false
 
       - name: Upload SBOM as artifact
         uses: actions/upload-artifact@v4

@@ -22,8 +22,21 @@ function Ensure-PSScriptAnalyzer {
 }
 
 function Get-RepositoryRoot {
-    $scriptRoot = Split-Path -Path $MyInvocation.MyCommand.Path -Parent
-    return (Resolve-Path -Path (Join-Path -Path $scriptRoot -ChildPath '..')).Path
+    $scriptRoot = if ($PSScriptRoot) {
+        $PSScriptRoot
+    }
+    elseif ($PSCommandPath) {
+        Split-Path -Path $PSCommandPath -Parent
+    }
+    elseif ($MyInvocation.MyCommand.Path) {
+        Split-Path -Path $MyInvocation.MyCommand.Path -Parent
+    }
+    else {
+        throw 'Unable to determine lint.ps1 location.'
+    }
+
+    $rootPath = Join-Path -Path $scriptRoot -ChildPath '..'
+    return (Resolve-Path -Path $rootPath).Path
 }
 
 function Get-FormatterTargets {
