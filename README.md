@@ -2,10 +2,28 @@
 
 [![CI Pipeline](https://github.com/unplugged12/mcp-stacks/actions/workflows/ci.yml/badge.svg)](https://github.com/unplugged12/mcp-stacks/actions/workflows/ci.yml)
 [![Deploy](https://github.com/unplugged12/mcp-stacks/actions/workflows/deploy.yml/badge.svg)](https://github.com/unplugged12/mcp-stacks/actions/workflows/deploy.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-GitOps-style deployment of MCP (Model Context Protocol) servers across multiple Docker hosts managed by Portainer CE.
+> **Production-grade GitOps infrastructure for deploying and managing Model Context Protocol (MCP) servers across distributed Docker environments.**
 
-**Portainer Server:** `https://jabba.lan:9444` (Edge tunnel on port 8000)
+## Why This Matters
+
+Modern IT infrastructure demands:
+- **Automated, repeatable deployments** that eliminate configuration drift
+- **Zero-trust secret management** that never commits credentials to source control
+- **Multi-environment orchestration** supporting both persistent and ephemeral workloads
+- **Infrastructure as Code** principles for auditability and version control
+
+This repository demonstrates **enterprise-grade DevOps practices** applied to container orchestration, showcasing:
+- ✅ **GitOps methodology** - Single source of truth with automated sync
+- ✅ **Security-first architecture** - Secrets delivered via encrypted channels, never stored in Git
+- ✅ **Production resilience** - Health checks, resource limits, logging, and rollback capabilities
+- ✅ **Multi-platform support** - Agent-based (always-on hosts) and Edge-based (roaming devices) deployment models
+- ✅ **CI/CD automation** - Automated testing, security scanning, and deployment workflows
+
+## Overview
+
+This platform manages MCP server deployments using GitOps principles with Portainer CE across heterogeneous infrastructure
 
 ---
 
@@ -37,6 +55,8 @@ This repository manages MCP server deployments using:
 - **Automated workflows**: Scripts for install, validation, and rollback
 
 **Key Principle:** **Never commit secrets to Git**
+
+> **📝 Note:** Throughout this documentation, `jabba.lan:9444` is used as an example Portainer server hostname. Replace this with your own Portainer server address (e.g., `portainer.example.com:9443` or your server's IP/hostname).
 
 ---
 
@@ -856,7 +876,9 @@ For the complete backlog ready for Azure DevOps/Jira import, see [docs/backlog.c
 
 ## License
 
-Private repository - all rights reserved.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+You are free to use, modify, and distribute this code in accordance with the MIT License terms.
 
 ---
 
