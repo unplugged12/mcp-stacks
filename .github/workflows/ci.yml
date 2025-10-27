@@ -200,7 +200,8 @@ jobs:
           image-ref: ${{ matrix.image }}
           format: 'table'
           severity: 'CRITICAL,HIGH'
-          exit-code: 0  # Don't fail on vulnerabilities in third-party images
+          ignore-unfixed: true
+          exit-code: 1
 
   test-scripts-linux:
     name: Test Scripts (Linux)
@@ -235,25 +236,25 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Test PowerShell script execution
+      - name: Install Pester
         shell: pwsh
         run: |
-          # Test scripts with -WhatIf where possible
-          Write-Host "Testing PowerShell scripts..."
-
-          $testableScripts = @(
-            "scripts/build-edge-config.ps1"
-          )
-
-          foreach ($script in $testableScripts) {
-            if (Test-Path $script) {
-              Write-Host "Testing: $script"
-              # Basic syntax validation already done in validate-scripts job
-              Write-Host "  ✓ Syntax valid"
-            }
+          if (-not (Get-Module -ListAvailable -Name Pester -ErrorAction Ignore | Where-Object { $_.Version.Major -ge 5 })) {
+            Install-Module -Name Pester -Force -SkipPublisherCheck -Scope CurrentUser
           }
 
-          Write-Host "✓ All PowerShell scripts tested successfully"
+      - name: Run PowerShell test suite
+        shell: pwsh
+        run: |
+          ./scripts/run-tests.ps1 -CI
+
+      - name: Publish Pester results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pester-results
+          path: TestResults/test-results.xml
+          retention-days: 14
 
   summary:
     name: CI Summary
@@ -297,3 +298,4 @@ jobs:
           else
             echo "✅ CI Pipeline Passed" >> $GITHUB_STEP_SUMMARY
           fi
+
