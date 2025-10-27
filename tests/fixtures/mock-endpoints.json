@@ -1,7 +1,7 @@
 [
   {
     "Id": 1,
-    "Name": "desktop-jabba",
+    "Name": "desktop-portainer-server",
     "Type": 1,
     "URL": "192.168.1.100:9001",
     "GroupId": 1,
@@ -49,7 +49,7 @@
     "UserAccessPolicies": {},
     "TeamAccessPolicies": {},
     "EdgeID": "edge-abc123",
-    "EdgeKey": "agenttunnel|edge-abc123|https://jabba.lan:9444|jabba.lan:8000",
+    "EdgeKey": "agenttunnel|edge-abc123|https://portainer-server.lan:9444|portainer-server.lan:8000",
     "TagIds": [],
     "Tags": null,
     "Kubernetes": {
@@ -68,7 +68,7 @@
     "UserAccessPolicies": {},
     "TeamAccessPolicies": {},
     "EdgeID": "edge-def456",
-    "EdgeKey": "agenttunnel|edge-def456|https://jabba.lan:9444|jabba.lan:8000",
+    "EdgeKey": "agenttunnel|edge-def456|https://portainer-server.lan:9444|portainer-server.lan:8000",
     "TagIds": [],
     "Tags": null,
     "Kubernetes": {

@@ -91,7 +91,7 @@ Transform the mcp-stacks GitOps deployment platform from a functional proof-of-c
 #### 1.2 Monitoring & Observability Foundation
 **Duration:** 2 weeks | **Owner:** SRE Lead
 
-- Deploy Prometheus + Grafana stack on Jabba (NAS) **or** migrate it to a
+- Deploy Prometheus + Grafana stack on portainer-server (NAS) **or** migrate it to a
   dedicated host when NAS resources are constrained
 - Implement cAdvisor for container metrics on all endpoints
 - Create Grafana dashboards for MCP service health
@@ -167,7 +167,7 @@ Transform the mcp-stacks GitOps deployment platform from a functional proof-of-c
 #### 3.1 Tailscale Integration
 **Duration:** 1 week | **Owner:** Network Engineer
 
-- Deploy Tailscale on Jabba NAS
+- Deploy Tailscale on portainer-server NAS
 - Create deployment scripts for Tailscale on endpoints
 - Update Portainer connection documentation for Tailscale
 - Test Edge agent connectivity over Tailscale mesh
@@ -291,8 +291,8 @@ Transform the mcp-stacks GitOps deployment platform from a functional proof-of-c
 - Portainer CE v2.x with API access
 - Docker Desktop on all endpoints
 - GitHub repository with Actions enabled (or Azure DevOps)
-- Network access to Jabba NAS (on-LAN or Tailscale)
-- Prometheus and Grafana infrastructure capacity on Jabba
+- Network access to portainer-server NAS (on-LAN or Tailscale)
+- Prometheus and Grafana infrastructure capacity on portainer-server
 - Team bandwidth: 1-2 FTE for 14 weeks
 
 ## Post-Launch Roadmap

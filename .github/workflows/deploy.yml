@@ -22,7 +22,7 @@ on:
         default: false
 
 env:
-  PORTAINER_URL: https://jabba.lan:9444
+  PORTAINER_URL: https://portainer-server.local:9444
 
 jobs:
   pre-deploy-validation:

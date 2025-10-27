@@ -509,7 +509,7 @@ if ($failedTests -eq 0) {
     Write-Host "Next steps:" -ForegroundColor Cyan
     Write-Host "  • Monitor container logs: docker logs <container-name> -f" -ForegroundColor White
     Write-Host "  • Check resource usage: docker stats" -ForegroundColor White
-    Write-Host "  • Access Portainer: https://jabba.lan:9444" -ForegroundColor White
+    Write-Host "  • Access Portainer: https://portainer-server.local:9444" -ForegroundColor White
 
     if ($warnings -gt 0) {
         Write-Host ""

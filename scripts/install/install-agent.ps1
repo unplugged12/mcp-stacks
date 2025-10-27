@@ -4,7 +4,7 @@
     Install Portainer Agent on desktop/always-on hosts
 .DESCRIPTION
     Deploys portainer/agent:latest on port 9001 with auto-restart.
-    Verifies connectivity from Jabba (https://jabba.lan:9444).
+    Verifies connectivity from portainer-server (https://portainer-server.local:9444).
 .EXAMPLE
     .\install-agent.ps1
 #>
@@ -97,7 +97,7 @@ Write-Host ""
 Write-Host "🎉 Portainer Agent installation complete!" -ForegroundColor Green
 Write-Host ""
 Write-Host "Next steps:" -ForegroundColor Cyan
-Write-Host "1. Log into Portainer at https://jabba.lan:9444" -ForegroundColor White
+Write-Host "1. Log into Portainer at https://portainer-server.local:9444" -ForegroundColor White
 Write-Host "2. Navigate to Environments → Add environment" -ForegroundColor White
 Write-Host "3. Select 'Docker Standalone' → 'Agent'" -ForegroundColor White
 Write-Host "4. Enter this machine's hostname/IP and port $AgentPort" -ForegroundColor White

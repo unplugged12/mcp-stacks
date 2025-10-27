@@ -40,16 +40,16 @@ Write-Host "[2/7] Checking Portainer UI (9444)..." -ForegroundColor Cyan
 try {
     # Handle SSL certificate validation for both PowerShell 5.1 and 7+
     if ($PSVersionTable.PSVersion.Major -ge 6) {
-        $response = Invoke-WebRequest -Uri "https://jabba.lan:9444" -SkipCertificateCheck -TimeoutSec 5 -UseBasicParsing
+        $response = Invoke-WebRequest -Uri "https://portainer-server.local:9444" -SkipCertificateCheck -TimeoutSec 5 -UseBasicParsing
     } else {
         # PowerShell 5.1 workaround
         $originalCallback = [System.Net.ServicePointManager]::ServerCertificateValidationCallback
         [System.Net.ServicePointManager]::ServerCertificateValidationCallback = {$true}
-        $response = Invoke-WebRequest -Uri "https://jabba.lan:9444" -TimeoutSec 5 -UseBasicParsing
+        $response = Invoke-WebRequest -Uri "https://portainer-server.local:9444" -TimeoutSec 5 -UseBasicParsing
         [System.Net.ServicePointManager]::ServerCertificateValidationCallback = $originalCallback
     }
     if ($response.StatusCode -eq 200) {
-        Write-Host "  ✓ Portainer UI reachable at https://jabba.lan:9444" -ForegroundColor Green
+        Write-Host "  ✓ Portainer UI reachable at https://portainer-server.local:9444" -ForegroundColor Green
         $passedChecks++
     } else {
         Write-Host "  ✗ Portainer returned status: $($response.StatusCode)" -ForegroundColor Red
@@ -63,7 +63,7 @@ try {
 # Check 3: Portainer Edge tunnel (8000)
 Write-Host "[3/7] Checking Portainer Edge tunnel (8000)..." -ForegroundColor Cyan
 try {
-    $tcpTest = Test-NetConnection -ComputerName jabba.lan -Port 8000 -InformationLevel Quiet
+    $tcpTest = Test-NetConnection -ComputerName portainer-server.local -Port 8000 -InformationLevel Quiet
     if ($tcpTest) {
         Write-Host "  ✓ Edge tunnel port 8000 accessible" -ForegroundColor Green
         $passedChecks++

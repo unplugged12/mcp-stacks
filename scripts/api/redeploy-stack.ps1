@@ -6,7 +6,7 @@
     Redeploys Agent or Edge stacks by pulling latest from Git.
     Supports both regular stacks (Agent) and Edge stacks.
 .PARAMETER PortainerUrl
-    Portainer server URL (default: https://jabba.lan:9444)
+    Portainer server URL (default: https://portainer-server.local:9444)
 .PARAMETER ApiKey
     Portainer API key (X-API-Key header)
 .PARAMETER StackName
@@ -22,7 +22,7 @@
 [CmdletBinding()]
 param(
     [Parameter()]
-    [string]$PortainerUrl = "https://jabba.lan:9444",
+    [string]$PortainerUrl = "https://portainer-server.local:9444",
 
     [Parameter(Mandatory)]
     [string]$ApiKey,

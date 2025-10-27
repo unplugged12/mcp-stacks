@@ -2,7 +2,7 @@
 #
 # Install Portainer Agent on desktop/always-on hosts
 # Deploys portainer/agent:latest on port 9001 with auto-restart.
-# Verifies connectivity from Jabba (https://jabba.lan:9444).
+# Verifies connectivity from portainer-server (https://portainer-server.local:9444).
 #
 
 set -euo pipefail
@@ -80,7 +80,7 @@ echo ""
 echo -e "${GREEN}🎉 Portainer Agent installation complete!${NC}"
 echo ""
 echo -e "${CYAN}Next steps:${NC}"
-echo -e "${NC}1. Log into Portainer at https://jabba.lan:9444${NC}"
+echo -e "${NC}1. Log into Portainer at https://portainer-server.local:9444${NC}"
 echo -e "${NC}2. Navigate to Environments → Add environment${NC}"
 echo -e "${NC}3. Select 'Docker Standalone' → 'Agent'${NC}"
 echo -e "${NC}4. Enter this machine's hostname/IP and port $AGENT_PORT${NC}"

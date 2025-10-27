@@ -74,7 +74,7 @@ Describe "Install-Edge-Agent Script Tests" -Tag "Unit" {
 
         It "Should reference correct Portainer URL" {
             $content = Get-Content $script:ScriptPath -Raw
-            $content | Should -Match 'https://jabba\.lan:9444'
+            $content | Should -Match 'https://portainer-server\.lan:9444'
         }
 
         It "Should mention laptops edge group" {

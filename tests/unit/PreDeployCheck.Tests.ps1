@@ -30,7 +30,7 @@ Describe "Pre-Deploy-Check Script Tests" -Tag "Unit" {
 
         It "Should check Portainer UI reachability on port 9444" {
             $content = Get-Content $script:ScriptPath -Raw
-            $content | Should -Match 'https://jabba\.lan:9444'
+            $content | Should -Match 'https://portainer-server\.lan:9444'
             $content | Should -Match 'Invoke-WebRequest'
         }
 

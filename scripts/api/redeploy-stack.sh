@@ -26,7 +26,7 @@ NC='\033[0m'
 API_KEY="${1:-}"
 STACK_NAME="${2:-}"
 TYPE="${3:-agent}"
-PORTAINER_URL="${PORTAINER_URL:-https://jabba.lan:9444}"
+PORTAINER_URL="${PORTAINER_URL:-https://portainer-server.local:9444}"
 
 if [ -z "$API_KEY" ] || [ -z "$STACK_NAME" ]; then
     echo -e "${RED}Usage: $0 <API_KEY> <STACK_NAME> [TYPE]${NC}"

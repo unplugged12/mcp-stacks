@@ -74,7 +74,7 @@ BeforeAll {
 ```json
 {
   "Id": 1,
-  "Name": "desktop-jabba",
+  "Name": "desktop-portainer-server",
   "Type": 1,
   "URL": "192.168.1.100:9001",
   "Status": 1

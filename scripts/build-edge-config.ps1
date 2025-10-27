@@ -111,7 +111,7 @@ Write-Host ""
 Write-Host "🎉 Edge Config bundle ready!" -ForegroundColor Green
 Write-Host ""
 Write-Host "Next steps:" -ForegroundColor Cyan
-Write-Host "1. Log into Portainer at https://jabba.lan:9444" -ForegroundColor White
+Write-Host "1. Log into Portainer at https://portainer-server.local:9444" -ForegroundColor White
 Write-Host "2. Navigate to Edge Configurations" -ForegroundColor White
 Write-Host "3. Create new configuration targeting 'laptops' Edge Group" -ForegroundColor White
 Write-Host "4. Upload: $outputZip" -ForegroundColor White

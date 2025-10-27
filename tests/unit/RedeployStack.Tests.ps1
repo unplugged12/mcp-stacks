@@ -32,7 +32,7 @@ Describe "Redeploy-Stack Script Tests" -Tag "Unit" {
 
         It "Should have default PortainerUrl parameter" {
             $content = Get-Content $script:ScriptPath -Raw
-            $content | Should -Match 'PortainerUrl.*=.*https://jabba\.lan:9444'
+            $content | Should -Match 'PortainerUrl.*=.*https://portainer-server\.lan:9444'
         }
     }
 

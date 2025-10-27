@@ -41,7 +41,7 @@ Required only for automated deployment via API. Manual deployment through Portai
 | `PORTAINER_API_KEY` | Portainer API access token | Deployment workflow | Portainer UI → User → Access tokens |
 
 **To create a Portainer API token:**
-1. Go to https://jabba.lan:9444
+1. Go to https://portainer-server.local:9444
 2. Click on your username (top-right)
 3. Navigate to "Access tokens"
 4. Click "Add access token"

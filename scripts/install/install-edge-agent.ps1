@@ -58,12 +58,12 @@ if ($Force -and $existingAgent) {
 if ([string]::IsNullOrWhiteSpace($DockerCommand)) {
     Write-Host ""
     Write-Host "Instructions:" -ForegroundColor Cyan
-    Write-Host "1. Log into Portainer at https://jabba.lan:9444" -ForegroundColor White
+    Write-Host "1. Log into Portainer at https://portainer-server.local:9444" -ForegroundColor White
     Write-Host "2. Navigate to Environments → Add environment" -ForegroundColor White
     Write-Host "3. Select 'Docker Standalone' → 'Edge Agent' → 'Standard'" -ForegroundColor White
     Write-Host "4. Configure:" -ForegroundColor White
     Write-Host "   - Name: <laptop-name>" -ForegroundColor White
-    Write-Host "   - Portainer server URL: https://jabba.lan:9444" -ForegroundColor White
+    Write-Host "   - Portainer server URL: https://portainer-server.local:9444" -ForegroundColor White
     Write-Host "   - Edge Group: laptops" -ForegroundColor White
     Write-Host "5. Copy the generated 'docker run' command" -ForegroundColor White
     Write-Host ""
@@ -164,7 +164,7 @@ Write-Host ""
 Write-Host "🎉 Portainer Edge Agent installation complete!" -ForegroundColor Green
 Write-Host ""
 Write-Host "The Edge Agent will:" -ForegroundColor Cyan
-Write-Host "• Connect to https://jabba.lan:9444 via tunnel port 8000" -ForegroundColor White
+Write-Host "• Connect to https://portainer-server.local:9444 via tunnel port 8000" -ForegroundColor White
 Write-Host "• Poll for commands every 5 seconds (default)" -ForegroundColor White
 Write-Host "• Check in periodically even when off-LAN" -ForegroundColor White
 Write-Host ""

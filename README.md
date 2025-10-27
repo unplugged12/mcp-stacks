@@ -56,7 +56,7 @@ This repository manages MCP server deployments using:
 
 **Key Principle:** **Never commit secrets to Git**
 
-> **📝 Note:** Throughout this documentation, `jabba.lan:9444` is used as an example Portainer server hostname. Replace this with your own Portainer server address (e.g., `portainer.example.com:9443` or your server's IP/hostname).
+> **📝 Note:** Throughout this documentation, `portainer-server.local:9444` is used as an example Portainer server hostname. Replace this with your own Portainer server address (e.g., `portainer.example.com:9443` or your server's IP/hostname).
 
 ---
 
@@ -150,9 +150,9 @@ deploy:
 ### Prerequisites
 
 - Docker Desktop installed on all endpoints
-- Portainer CE running at `https://jabba.lan:9444`
+- Portainer CE running at `https://portainer-server.local:9444`
 - Git and GitHub CLI (`gh`) configured
-- Network access to Jabba (on-LAN or via VPN/Tailscale)
+- Network access to your Portainer server (on-LAN or via VPN/Tailscale)
 
 ### 1. Clone Repository
 
@@ -178,7 +178,7 @@ cd mcp-stacks
 
 #### Agent Endpoints (Desktops)
 
-1. Go to https://jabba.lan:9444
+1. Go to https://portainer-server.local:9444
 2. **Environments** → **Add environment**
 3. Select **Docker Standalone** → **Agent**
 4. Enter:
@@ -188,12 +188,12 @@ cd mcp-stacks
 
 #### Edge Endpoints (Laptops)
 
-1. Go to https://jabba.lan:9444
+1. Go to https://portainer-server.local:9444
 2. **Environments** → **Add environment**
 3. Select **Docker Standalone** → **Edge Agent** → **Standard**
 4. Configure:
    - **Name:** `laptop-<name>`
-   - **Portainer server URL:** `https://jabba.lan:9444`
+   - **Portainer server URL:** `https://portainer-server.local:9444`
    - **Edge Group:** `laptops` (create if doesn't exist)
 5. Copy the generated `docker run` command
 6. Run the install script and paste the command when prompted
@@ -641,7 +641,7 @@ git push origin main
 
 ### Via UI (Edge)
 
-1. https://jabba.lan:9444/#!/edge/stacks
+1. https://portainer-server.local:9444/#!/edge/stacks
 2. Select stack
 3. Click **Pull and redeploy**
 
@@ -661,7 +661,7 @@ git push origin main
 ### Option 1: WireGuard VPN (Existing)
 
 - Configure WireGuard client on laptops
-- DNS: Ensure `jabba.lan` resolves via WireGuard DNS
+- DNS: Ensure `portainer-server.local` resolves via WireGuard DNS
 
 ### Option 2: Tailscale (Recommended for Roaming)
 
@@ -674,10 +674,10 @@ git push origin main
 
 #### Install Tailscale
 
-**On Jabba (NAS):**
+**On portainer-server (NAS):**
 ```bash
 curl -fsSL https://tailscale.com/install.sh | sh
-sudo tailscale up --ssh --hostname jabba
+sudo tailscale up --ssh --hostname portainer-server
 ```
 
 **On Windows Laptops:**
@@ -704,7 +704,7 @@ tailscale up --auth-key tskey-auth-XXXXX --ssh --hostname <name>
 
 Once connected, access via Tailscale hostname:
 ```
-https://jabba.tail<YOUR_TAILNET>.ts.net:9444
+https://portainer-server.tail<YOUR_TAILNET>.ts.net:9444
 ```
 
 Or update your hosts to use Tailscale IP.
@@ -720,7 +720,7 @@ Or update your hosts to use Tailscale IP.
 **Solutions:**
 1. Check Edge tunnel reachability:
    ```powershell
-   Test-NetConnection jabba.lan -Port 8000
+   Test-NetConnection portainer-server.local -Port 8000
    ```
 2. Verify agent container is running:
    ```bash
@@ -730,7 +730,7 @@ Or update your hosts to use Tailscale IP.
    ```bash
    docker logs portainer_edge_agent
    ```
-4. Ensure Portainer server URL is `https://jabba.lan:9444` (not 9443!)
+4. Ensure Portainer server URL is `https://portainer-server.local:9444` (not 9443!)
 
 ### Stack Deployment Fails
 

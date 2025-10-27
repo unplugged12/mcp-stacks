@@ -6,7 +6,7 @@
     Reverts a Portainer stack to a specific Git commit hash.
     Works with Agent-based stacks using GitOps polling.
 .PARAMETER PortainerUrl
-    Portainer server URL (default: https://jabba.lan:9444)
+    Portainer server URL (default: https://portainer-server.local:9444)
 .PARAMETER ApiKey
     Portainer API key
 .PARAMETER StackName
@@ -22,7 +22,7 @@
 [CmdletBinding()]
 param(
     [Parameter()]
-    [string]$PortainerUrl = "https://jabba.lan:9444",
+    [string]$PortainerUrl = "https://portainer-server.local:9444",
 
     [Parameter(Mandatory)]
     [string]$ApiKey,
