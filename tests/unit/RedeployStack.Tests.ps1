@@ -17,12 +17,12 @@ Describe "Redeploy-Stack Script Tests" -Tag "Unit" {
 
         It "Should have mandatory ApiKey parameter" {
             $content = Get-Content $script:ScriptPath -Raw
-            $content | Should -Match '\[Parameter\(Mandatory\)\].*\$ApiKey'
+            $content | Should -Match '(?s)\[Parameter\(Mandatory\)\].*?\$ApiKey'
         }
 
         It "Should have mandatory StackName parameter" {
             $content = Get-Content $script:ScriptPath -Raw
-            $content | Should -Match '\[Parameter\(Mandatory\)\].*\$StackName'
+            $content | Should -Match '(?s)\[Parameter\(Mandatory\)\].*?\$StackName'
         }
 
         It "Should have Type parameter with ValidateSet" {

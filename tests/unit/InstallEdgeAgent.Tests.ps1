@@ -17,7 +17,7 @@ Describe "Install-Edge-Agent Script Tests" -Tag "Unit" {
 
         It "Should have DockerCommand parameter" {
             $content = Get-Content $script:ScriptPath -Raw
-            $content | Should -Match '\[Parameter\(\)\].*\$DockerCommand'
+            $content | Should -Match '(?s)\[Parameter\(\)\].*?\$DockerCommand'
         }
 
         It "Should have Force switch parameter" {

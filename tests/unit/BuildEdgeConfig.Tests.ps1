@@ -77,7 +77,7 @@ Describe "Build-EdgeConfig Script Tests" -Tag "Unit" {
         It "Should not contain hardcoded secrets" {
             $content = Get-Content $script:ScriptPath -Raw
             $content | Should -Not -Match 'ptr_[a-zA-Z0-9]+'
-            $content | Should -Not -Match 'password\s*=\s*["\'][^"\']+["\']'
+            $content | Should -Not -Match 'password\s*=\s*["''][^"'']+["'']'
         }
 
         It "Should warn about not committing secrets" {
