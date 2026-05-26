@@ -53,4 +53,4 @@ Write-Host ""
 Write-Host "🎉 Portainer Agent uninstalled successfully!" -ForegroundColor Green
 Write-Host ""
 Write-Host "Remember to remove this environment from Portainer UI:" -ForegroundColor Yellow
-Write-Host "https://portainer-server.local:9444 → Environments → Remove this host" -ForegroundColor White
+Write-Host "https://portainer-server.lan:9444 → Environments → Remove this host" -ForegroundColor White

@@ -8,7 +8,6 @@
 set -euo pipefail
 
 # Colors
-RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 CYAN='\033[0;36m'
@@ -53,4 +52,4 @@ echo ""
 echo -e "${GREEN}🎉 Portainer Agent uninstalled successfully!${NC}"
 echo ""
 echo -e "${YELLOW}Remember to remove this environment from Portainer UI:${NC}"
-echo -e "${NC}https://portainer-server.local:9444 → Environments → Remove this host${NC}"
+echo -e "${NC}https://portainer-server.lan:9444 → Environments → Remove this host${NC}"
