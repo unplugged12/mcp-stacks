@@ -13,7 +13,7 @@ jobs:
     runs-on: windows-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Ensure PSScriptAnalyzer
         shell: pwsh
@@ -37,7 +37,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Install shellcheck
         run: |
@@ -60,7 +60,7 @@ jobs:
     needs: [lint-powershell]
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Check Docker availability
         shell: pwsh
@@ -96,7 +96,7 @@ jobs:
       security-events: write
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@v0.36.0
@@ -128,7 +128,7 @@ jobs:
         stack: [common, desktop, laptop]
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4
@@ -162,7 +162,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Generate SBOM with Syft
         uses: anchore/sbom-action@v0.24.0
@@ -217,7 +217,7 @@ jobs:
     needs: [lint-bash]
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Install Docker
         run: |
@@ -242,7 +242,7 @@ jobs:
     needs: [lint-powershell, validate-scripts]
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Install Pester
         shell: pwsh
